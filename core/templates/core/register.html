@@ -336,11 +336,9 @@
       <!-- First name -->
       <div class="input_group" style="margin-bottom: 0.2rem;">
         <input type="text" id="first-name" name="first_name" placeholder=" " required
-          value="{{ form.first_name.value|default_if_none:'' }}" {% if form.first_name.errors
-          %}style="border-color:#ef4444;" {% endif %}>
+          value="{{ form.first_name.value|default_if_none:'' }}" {% if form.first_name.errors %}style="border-color:#ef4444;" {% endif %}>
         <i class="fas fa-user icon"></i>
-        <label for="first-name">{% if request.LANGUAGE_CODE == 'sw' %}Jina la Kwanza{% else %}First name{% endif
-          %}</label>
+        <label for="first-name">{% if request.LANGUAGE_CODE == 'sw' %}Jina la Kwanza{% else %}First name{% endif %}</label>
       </div>
       {% for error in form.first_name.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
         error }}</div>{% endfor %}
@@ -348,11 +346,9 @@
       <!-- Last name -->
       <div class="input_group" style="margin-top: 0.8rem; margin-bottom: 0.2rem;">
         <input type="text" id="last-name" name="last_name" placeholder=" " required
-          value="{{ form.last_name.value|default_if_none:'' }}" {% if form.last_name.errors
-          %}style="border-color:#ef4444;" {% endif %}>
+          value="{{ form.last_name.value|default_if_none:'' }}" {% if form.last_name.errors %}style="border-color:#ef4444;" {% endif %}>
         <i class="fas fa-user icon"></i>
-        <label for="last-name">{% if request.LANGUAGE_CODE == 'sw' %}Jina la Mwisho{% else %}Last name{% endif
-          %}</label>
+        <label for="last-name">{% if request.LANGUAGE_CODE == 'sw' %}Jina la Mwisho{% else %}Last name{% endif %}</label>
       </div>
       {% for error in form.last_name.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
         error }}</div>{% endfor %}
@@ -362,11 +358,9 @@
         <div style="width: 100%;">
           <div class="input_group" style="margin-bottom: 0.2rem;">
             <input type="text" id="phone" name="phone" placeholder=" " required
-              value="{{ form.phone.value|default_if_none:'' }}" {% if form.phone.errors %}style="border-color:#ef4444;"
-              {% endif %}>
+              value="{{ form.phone.value|default_if_none:'' }}" {% if form.phone.errors %}style="border-color:#ef4444;"{% endif %}>
             <i class="fas fa-phone icon"></i>
-            <label for="phone">{% if request.LANGUAGE_CODE == 'sw' %}Namba ya Simu{% else %}Phone number{% endif
-              %}</label>
+            <label for="phone">{% if request.LANGUAGE_CODE == 'sw' %}Namba ya Simu{% else %}Phone number{% endif %}</label>
           </div>
           {% for error in form.phone.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
             error }}</div>{% endfor %}
@@ -376,11 +370,9 @@
         <div style="width: 100%;">
           <div class="input_group" style="margin-bottom: 0.2rem;">
             <input type="email" id="email" name="email" placeholder=" " required
-              value="{{ form.email.value|default_if_none:'' }}" {% if form.email.errors %}style="border-color:#ef4444;"
-              {% endif %}>
+              value="{{ form.email.value|default_if_none:'' }}" {% if form.email.errors %}style="border-color:#ef4444;"{% endif %}>
             <i class="fas fa-envelope icon"></i>
-            <label for="email">{% if request.LANGUAGE_CODE == 'sw' %}Barua pepe{% else %}Email address{% endif
-              %}</label>
+            <label for="email">{% if request.LANGUAGE_CODE == 'sw' %}Barua pepe{% else %}Email address{% endif %}</label>
           </div>
           {% for error in form.email.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
             error }}</div>{% endfor %}
@@ -393,12 +385,9 @@
           <div class="input_group" style="margin-bottom: 0.2rem; position: relative;">
             <select id="gender" name="gender" required
               style="width: 100%; padding: 1.2rem 2.6rem 0.4rem 3.0rem; font-size: 0.95rem; background: rgba(255, 255, 255, 0.6); border: 2px solid rgba(226, 232, 240, 0.6); border-radius: 12px; height: 3.2rem; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); color: #1e293b; font-weight: 600; appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; {% if form.gender.errors %}border-color:#ef4444;{% endif %}">
-              <option value="" disabled {% if not form.gender.value %}selected{% endif %}>{% if request.LANGUAGE_CODE ==
-                'sw' %}Chagua Jinsia{% else %}Select Gender{% endif %}</option>
-              <option value="M" {% if form.gender.value=='M' %}selected{% endif %}>{% if request.LANGUAGE_CODE == 'sw'
-                %}Mwanaume{% else %}Male{% endif %}</option>
-              <option value="F" {% if form.gender.value=='F' %}selected{% endif %}>{% if request.LANGUAGE_CODE == 'sw'
-                %}Mwanamke{% else %}Female{% endif %}</option>
+              <option value="" disabled {% if not form.gender.value %}selected{% endif %}>{% if request.LANGUAGE_CODE == 'sw' %}Chagua Jinsia{% else %}Select Gender{% endif %}</option>
+              <option value="M" {% if form.gender.value == 'M' %}selected{% endif %}>{% if request.LANGUAGE_CODE == 'sw' %}Mwanaume{% else %}Male{% endif %}</option>
+              <option value="F" {% if form.gender.value == 'F' %}selected{% endif %}>{% if request.LANGUAGE_CODE == 'sw' %}Mwanamke{% else %}Female{% endif %}</option>
             </select>
             <i class="fas fa-users icon"></i>
             <i class="fas fa-chevron-down"
@@ -412,8 +401,7 @@
         <div style="width: 100%;">
           <div class="input_group" style="margin-bottom: 0.2rem;">
             <input type="text" id="address" name="address" placeholder=" " required
-              value="{{ form.address.value|default_if_none:'' }}" {% if form.address.errors
-              %}style="border-color:#ef4444;" {% endif %}>
+              value="{{ form.address.value|default_if_none:'' }}" {% if form.address.errors %}style="border-color:#ef4444;" {% endif %}>
             <i class="fas fa-map-marker-alt icon"></i>
             <label for="address">{% if request.LANGUAGE_CODE == 'sw' %}Anuani{% else %}Address{% endif %}</label>
           </div>
@@ -443,8 +431,7 @@
               autocomplete="new-password" required
               style="padding-right: 40px;{% if form.password1.errors or form.password2.errors %} border-color:#ef4444;{% endif %}">
             <i class="fas fa-check-circle icon"></i>
-            <label for="confirm-password">{% if request.LANGUAGE_CODE == 'sw' %}Thibitisha Nenosiri{% else %}Confirm
-              password{% endif %}</label>
+            <label for="confirm-password">{% if request.LANGUAGE_CODE == 'sw' %}Thibitisha Nenosiri{% else %}Confirm password{% endif %}</label>
             <i class="fas fa-eye" id="toggleRegConfirmPassword"
               style="position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; pointer-events: auto; z-index: 10;"></i>
           </div>
@@ -463,16 +450,14 @@
       </div>
       {% endif %}
 
-      <button type="submit">{% if request.LANGUAGE_CODE == 'sw' %}Tengeneza Akaunti{% else %}Create Account{% endif
-        %}</button>
+      <button type="submit">{% if request.LANGUAGE_CODE == 'sw' %}Tengeneza Akaunti{% else %}Create Account{% endif %}</button>
       <a href="{% url 'login' %}" class="back-link">{% if request.LANGUAGE_CODE == 'sw' %}Tayari una akaunti?
         <span>Ingia hapa</span>{% else %}Already have an account? <span>Sign In</span>{% endif %}</a>
 
       <!-- Go Back -->
       <div class="go-back-container">
         <button type="button" class="go-back-btn" onclick="window.location.href='{% url 'home' %}'">
-          <i class="fas fa-arrow-left"></i> {% if request.LANGUAGE_CODE == 'sw' %}Rudi Mwanzo{% else %}Back to home{%
-          endif %}
+          <i class="fas fa-arrow-left"></i> {% if request.LANGUAGE_CODE == 'sw' %}Rudi Mwanzo{% else %}Back to home{% endif %}
         </button>
       </div>
     </div>
