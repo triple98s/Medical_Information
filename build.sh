@@ -2,4 +2,5 @@
 set -o errexit
 
 python manage.py migrate --noinput
+python manage.py seed_plants
 python manage.py collectstatic --noinput

@@ -1,0 +1,137 @@
+[
+    {
+        "model":  "core.medicinalplant",
+        "pk":  1,
+        "fields":  {
+                       "scientific_name":  "Azadirachta indica",
+                       "local_name":  "Mwarobaini",
+                       "common_name":  "Neem",
+                       "benefits_en":  "Boosts immune system, exhibits strong antibacterial and antifungal properties, and acts as a natural insect repellent.",
+                       "benefits_sw":  "Huongeza kinga ya mwili, ina nguvu kubwa ya kuua bakteria na fangasi, na hufukuza wadudu wadogo kwa asili.",
+                       "medicinal_uses_en":  "Used in treating skin disorders, dental plaque reduction, managing blood sugar levels, and combating malaria symptoms.",
+                       "medicinal_uses_sw":  "Hutumika kutibu magonjwa ya ngozi, kupunguza uchafu wa meno, kudhibiti sukari mwilini, na kupambana na dalili za malaria.",
+                       "precautions_en":  null,
+                       "precautions_sw":  null
+                   }
+    },
+    {
+        "model":  "core.medicinalplant",
+        "pk":  2,
+        "fields":  {
+                       "scientific_name":  "Aloe vera",
+                       "local_name":  "Mshubiri",
+                       "common_name":  "Aloe Vera",
+                       "benefits_en":  "Deeply hydrates the skin, rich in antioxidants, promotes wound healing, and supports cellular regeneration.",
+                       "benefits_sw":  "Hulainisha na kurutubisha ngozi, ina viondoa sumu mwilini, huharakisha kupona kwa vidonda, na kusaidia kuzalisha seli mpya za ngozi.",
+                       "medicinal_uses_en":  "Excellent for treating sunburns, minor cuts, skin irritation, digestive health improvements, and reducing inflammation.",
+                       "medicinal_uses_sw":  "Ni nzuri kwa kutibu majeraha ya moto, mikwaruzo midogo, miwasho ya ngozi, kuboresha mfumo wa mmeng\u0027enyo, na kupunguza maumivu au kuvimba.",
+                       "precautions_en":  null,
+                       "precautions_sw":  null
+                   }
+    },
+    {
+        "model":  "core.medicinalplant",
+        "pk":  3,
+        "fields":  {
+                       "scientific_name":  "Moringa oleifera",
+                       "local_name":  "Mlonge",
+                       "common_name":  "Moringa",
+                       "benefits_en":  "Highly nutritious superfood, rich in vitamins A, C, and E, potassium, calcium, and essential amino acids.",
+                       "benefits_sw":  "Chakula chenye virutubisho vingi mno, kina vitamini A, C, na E, potasiamu, kalisi, na asidi muhimu za amino.",
+                       "medicinal_uses_en":  "Used to manage high blood pressure, reduce inflammation, lower blood cholesterol, and combat malnutrition.",
+                       "medicinal_uses_sw":  "Hutumika kudhibiti shinikizo la juu la damu, kupunguza uvimbe, kushusha mafuta mabaya mwilini (cholesterol), na kupambana na utapiamlo.",
+                       "precautions_en":  null,
+                       "precautions_sw":  null
+                   }
+    },
+    {
+        "model":  "core.medicinalplant",
+        "pk":  4,
+        "fields":  {
+                       "scientific_name":  "Ocimum gratissimum",
+                       "local_name":  "Kivumbasi",
+                       "common_name":  "Wild Basil / African Basil",
+                       "benefits_en":  "Rich in aromatic essential oils, acts as a natural antioxidant, antibacterial, and respiratory support.",
+                       "benefits_sw":  "Kina mafuta yenye harufu nzuri na faida kubwa, kina viondoa sumu, huua bakteria, na kusaidia mfumo wa hewa.",
+                       "medicinal_uses_en":  "Used to treat coughs, colds, fever, abdominal pains, diarrhea, and skin infections.",
+                       "medicinal_uses_sw":  "Hutumika kutibu kikohozi, mafua, homa, maumivu ya tumbo, kuhara, na maambukizi ya ngozi.",
+                       "precautions_en":  null,
+                       "precautions_sw":  null
+                   }
+    },
+    {
+        "model":  "core.medicinalplant",
+        "pk":  5,
+        "fields":  {
+                       "scientific_name":  "Psidium guajava",
+                       "local_name":  "Mpera",
+                       "common_name":  "Guava Tree",
+                       "benefits_en":  "High content of Vitamin C and dietary fiber, supports heart health, and strengthens the immune system.",
+                       "benefits_sw":  "Kina kiasi kikubwa cha Vitamini C na nyuzinyuzi za chakula, husaidia afya ya moyo, na kuimarisha kinga ya mwili.",
+                       "medicinal_uses_en":  "Guava leaves are used for managing diarrhea, sore throat, coughs, and regulating blood glucose levels.",
+                       "medicinal_uses_sw":  "Majani ya mpera hutumika kutibu kuhara, maumivu ya koo, kikohozi, na kudhibiti viwango vya sukari kwenye damu.",
+                       "precautions_en":  null,
+                       "precautions_sw":  null
+                   }
+    },
+    {
+        "model":  "core.medicinalplant",
+        "pk":  7,
+        "fields":  {
+                       "scientific_name":  "Mentha piperita",
+                       "local_name":  "Mnanaa",
+                       "common_name":  "Peppermint",
+                       "benefits_en":  "Provides cooling sensations, relaxes gastrointestinal muscles, and freshens breath.",
+                       "benefits_sw":  "Hutoa hisia ya baridi na kuburudisha, hulegeza misuli ya mfumo wa chakula, na kusafisha harufu ya kinywa.",
+                       "medicinal_uses_en":  "Alleviates irritable bowel syndrome (IBS), headaches, nausea, indigestion, and common cold symptoms.",
+                       "medicinal_uses_sw":  "Hupunguza matatizo ya tumbo (IBS), maumivu ya kichwa, kichefuchefu, kiungulia, na dalili za mafua.",
+                       "precautions_en":  null,
+                       "precautions_sw":  null
+                   }
+    },
+    {
+        "model":  "core.medicinalplant",
+        "pk":  8,
+        "fields":  {
+                       "scientific_name":  "Cajanus cajan",
+                       "local_name":  "Mbaazi",
+                       "common_name":  "Pigeon Pea",
+                       "benefits_en":  "Rich source of plant-based protein, dietary fiber, and essential minerals like iron and folate.",
+                       "benefits_sw":  "Chanzo kikubwa cha protini ya mimea, nyuzinyuzi za chakula, na madini muhimu kama chuma na folate.",
+                       "medicinal_uses_en":  "Used in traditional medicine to manage diabetes, treat dysentery, reduce fever, and soothe toothaches.",
+                       "medicinal_uses_sw":  "Hutumika katika tiba asili kudhibiti ugonjwa wa kisukari, kutibu kuhara damu, kupunguza homa, na kutibu maumivu ya meno.",
+                       "precautions_en":  null,
+                       "precautions_sw":  null
+                   }
+    },
+    {
+        "model":  "core.medicinalplant",
+        "pk":  9,
+        "fields":  {
+                       "scientific_name":  "Sesbania sesban",
+                       "local_name":  "Mkundekunde",
+                       "common_name":  "River Bean",
+                       "benefits_en":  "High nitrogen-fixing plant that enriches soil, rich in saponins and antioxidants.",
+                       "benefits_sw":  "Mmea unaorutubisha udongo kwa kuongeza naitrojeni, una saponins na viondoa sumu mbalimbali.",
+                       "medicinal_uses_en":  "Used for anti-inflammatory treatments, wound healing, relieving sore throats, and treating skin eruptions.",
+                       "medicinal_uses_sw":  "Hutumika kupunguza uvimbe, kutibu vidonda, kupunguza maumivu ya koo, na kutibu upele au ugonjwa wa ngozi.",
+                       "precautions_en":  null,
+                       "precautions_sw":  null
+                   }
+    },
+    {
+        "model":  "core.medicinalplant",
+        "pk":  10,
+        "fields":  {
+                       "scientific_name":  "Plectranthus barbatus",
+                       "local_name":  "Mpatakuva",
+                       "common_name":  "Coleus",
+                       "benefits_en":  "Contains forskolin which activates cellular enzymes, supports cellular metabolism and circulation.",
+                       "benefits_sw":  "Ina forskolin ambayo huamsha vimeng\u0027enya vya seli, husaidia kimetaboliki na mzunguko wa damu.",
+                       "medicinal_uses_en":  "Used to treat respiratory disorders like asthma, high blood pressure, digestive issues, and skin allergies.",
+                       "medicinal_uses_sw":  "Hutumika kutibu matatizo ya mfumo wa hewa kama pumu, shinikizo la juu la damu, matatizo ya tumbo, na mzio (allergy) ya ngozi.",
+                       "precautions_en":  null,
+                       "precautions_sw":  null
+                   }
+    }
+]
