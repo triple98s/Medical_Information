@@ -1,0 +1,111 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Vigezo na Masharti{% else %}Terms of Service{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+    .info-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px 20px 60px;
+    }
+    .info-card {
+        background: #ffffff;
+        border-radius: 30px;
+        padding: 40px 48px;
+        box-shadow: 0 12px 40px rgba(20, 60, 20, 0.05);
+        border: 1px solid #dceadc;
+    }
+    .info-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e2ede2;
+    }
+    .info-header h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #084608;
+        letter-spacing: -0.5px;
+    }
+    .info-header p {
+        color: #3a5f3a;
+        margin-top: 10px;
+        font-size: 1.05rem;
+    }
+    .info-section {
+        margin-bottom: 28px;
+    }
+    .info-section h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0e740e;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .info-section h3 .material-icons {
+        color: #2a7a2a;
+        font-size: 24px;
+    }
+    .info-section p, .info-section ul {
+        color: #1a2e1a;
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+    .info-section ul {
+        padding-left: 24px;
+        margin-top: 10px;
+    }
+    .info-section li {
+        margin-bottom: 6px;
+    }
+</style>
+
+<div class="info-container">
+    <div class="info-card">
+        <div class="info-header">
+            <h1>{% if request.LANGUAGE_CODE == 'sw' %}Vigezo na Masharti{% else %}Terms of Service{% endif %}</h1>
+            <p>{% if request.LANGUAGE_CODE == 'sw' %}Tafadhali soma vigezo vyetu kabla ya kutumia mfumo.{% else %}Please read our terms before using the system.{% endif %}</p>
+        </div>
+
+        {% if request.LANGUAGE_CODE == 'sw' %}
+        <div class="info-section">
+            <h3><span class="material-icons">gavel</span> 1. Kukubaliana na Masharti</h3>
+            <p>Kwa kutumia mfumo huu wa PlantID Medicine, unakubaliana na vigezo na masharti yaliyoainishwa hapa. Kama hukubaliani nayo, tafadhali usitumie mfumo huu.</p>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">local_pharmacy</span> 2. Maelezo ya Matibabu</h3>
+            <p>Taarifa za dawa na matumizi ya mimea zinazotolewa hapa ni kwa ajili ya <strong>kuelimisha tu</strong>. Sio mbadala wa ushauri wa kitaalamu wa daktari. Wasiliana na mtaalamu wa afya kabla ya kutumia mmea wowote kama dawa.</p>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">verified_user</span> 3. Matumizi Sahihi</h3>
+            <p>Unapaswa kutumia mfumo huu kwa madhumuni halali pekee. Hairuhusiwi kujaribu kuharibu mfumo, kupakia picha zisizofaa, au kutumia taarifa zetu kwa manufaa ya kibiashara bila ruhusa yetu.</p>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">update</span> 4. Mabadiliko ya Masharti</h3>
+            <p>Tuna haki ya kubadilisha vigezo na masharti haya wakati wowote bila taarifa ya awali. Matumizi yako ya kuendelea ya mfumo yatachukuliwa kuwa unakubaliana na mabadiliko hayo.</p>
+        </div>
+
+        {% else %}
+        <div class="info-section">
+            <h3><span class="material-icons">gavel</span> 1. Acceptance of Terms</h3>
+            <p>By using the PlantID Medicine platform, you agree to be bound by these terms and conditions. If you do not agree, please refrain from using our services.</p>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">local_pharmacy</span> 2. Medical Disclaimer</h3>
+            <p>The medicinal information provided on this platform is for <strong>educational purposes only</strong>. It is not a substitute for professional medical advice. Always consult a healthcare professional before using any plant for medicinal purposes.</p>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">verified_user</span> 3. Proper Usage</h3>
+            <p>You agree to use this platform only for lawful purposes. You are strictly prohibited from attempting to hack the system, uploading inappropriate images, or using our data for commercial purposes without our permission.</p>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">update</span> 4. Changes to Terms</h3>
+            <p>We reserve the right to modify these terms of service at any time without prior notice. Your continued use of the platform constitutes acceptance of any such changes.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

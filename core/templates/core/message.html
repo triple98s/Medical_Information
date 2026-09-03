@@ -1,0 +1,67 @@
+{% extends 'core/base.html' %}
+{% block title %}Messages - PlantMed{% endblock %}
+{% block content %}
+<div class="hero">
+  <h1>💬 {% if request.LANGUAGE_CODE == 'sw' %}Tuma Ujumbe{% else %}Send a Message{% endif %}</h1>
+  <h3>{% if request.LANGUAGE_CODE == 'sw' %}Maoni kwa Msimamizi{% else %}Feedback to Admin{% endif %}</h3>
+  <p>{% if request.LANGUAGE_CODE == 'sw' %}Tuma maoni, mapendekezo, au ripoti taarifa zisizo sahihi kwa msimamizi wa mfumo.{% else %}Send feedback, suggestions, or report incorrect info to the system administrator.{% endif %}</p>
+</div>
+
+<div class="id-card" style="max-width: 800px; margin: 0 auto;">
+  <div style="padding: 20px 10px;">
+
+
+    <form method="post" action="{% url 'message' %}">
+      {% csrf_token %}
+      
+      <div style="margin-bottom: 20px;">
+        <label style="display:block; font-weight:700; color:#153015; margin-bottom:8px;">
+          {% if request.LANGUAGE_CODE == 'sw' %}Mada{% else %}Subject{% endif %}
+        </label>
+        {% if request.LANGUAGE_CODE == 'sw' %}
+          <input type="text" name="subject" maxlength="255" required id="id_subject" placeholder="Mada" value="{{ form.subject.value|default_if_none:'' }}">
+        {% else %}
+          {{ form.subject }}
+        {% endif %}
+        {% for error in form.subject.errors %}
+          <small style="color: red; display:block; margin-top:5px;">{{ error }}</small>
+        {% endfor %}
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display:block; font-weight:700; color:#153015; margin-bottom:8px;">
+          {% if request.LANGUAGE_CODE == 'sw' %}Ujumbe{% else %}Body{% endif %}
+        </label>
+        {% if request.LANGUAGE_CODE == 'sw' %}
+          <textarea name="body" cols="40" rows="4" required id="id_body" placeholder="Ujumbe wako">{{ form.body.value|default_if_none:'' }}</textarea>
+        {% else %}
+          {{ form.body }}
+        {% endif %}
+        {% for error in form.body.errors %}
+          <small style="color: red; display:block; margin-top:5px;">{{ error }}</small>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn-primary" style="padding: 14px 30px; border-radius: 60px; font-weight: 700; font-size: 1rem; cursor: pointer;">
+        {% if request.LANGUAGE_CODE == 'sw' %}Tuma Ujumbe{% else %}Send Message{% endif %}
+      </button>
+    </form>
+  </div>
+</div>
+<style>
+  input[type="text"], textarea {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: 1px solid #cde0cd;
+    background: #f8fcf8;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.2s;
+  }
+  input[type="text"]:focus, textarea:focus {
+    border-color: #2b7a2b;
+    box-shadow: 0 0 0 4px rgba(40, 130, 40, 0.12);
+  }
+</style>
+{% endblock %}

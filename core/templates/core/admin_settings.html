@@ -1,0 +1,728 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Mipangilio ya Admin{% else %}Admin Settings{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+    .settings-container {
+        width: 98%;
+        max-width: none;
+        margin: 0 auto;
+        padding: 10px 0 40px;
+    }
+
+    .settings-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .settings-header h1 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #084608;
+        letter-spacing: -0.5px;
+    }
+
+    .settings-header p {
+        color: #3a5f3a;
+        margin-top: 6px;
+        font-size: 0.95rem;
+    }
+
+    .settings-card {
+        background: #ffffff;
+        border-radius: 28px;
+        padding: 28px 32px;
+        box-shadow: 0 8px 32px rgba(20, 60, 20, 0.05);
+        border: 1px solid #dceadc;
+        margin-bottom: 24px;
+    }
+
+    .settings-card h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0e740e;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .settings-card h3 .material-icons {
+        font-size: 24px;
+        color: #2a7a2a;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #1a3a1a;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 14px 20px;
+        border-radius: 16px;
+        border: 2px solid #dceadc;
+        background: #f8fcf8;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #1a2e1a;
+        outline: none;
+        transition: 0.25s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-group input:focus {
+        border-color: #2b7a2b;
+        box-shadow: 0 0 0 4px rgba(40, 130, 40, 0.1);
+        background: #ffffff;
+    }
+
+    .form-group input:disabled {
+        background: #eef5ee;
+        color: #6a8a6a;
+        cursor: not-allowed;
+    }
+
+    .settings-btn {
+        width: 100%;
+        padding: 14px 28px;
+        border-radius: 60px;
+        border: none;
+        background: linear-gradient(145deg, #1f5a1f, #2a7a2a);
+        color: white;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.25s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 8px 20px rgba(30, 80, 30, 0.15);
+        margin-top: 8px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .settings-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(30, 80, 30, 0.22);
+    }
+
+    .settings-btn:active {
+        transform: scale(0.98);
+    }
+
+    /* User info card */
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 18px 0 10px;
+    }
+
+    .user-avatar-container {
+        position: relative;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        cursor: pointer;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(30, 80, 30, 0.15);
+        transition: all 0.3s ease;
+    }
+
+    .user-avatar-container:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(30, 80, 30, 0.25);
+    }
+
+    .user-avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .user-avatar-letter {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #1f5a1f, #3a9a3a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .user-avatar-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 50%;
+    }
+
+    .user-avatar-container:hover .user-avatar-overlay {
+        opacity: 1;
+    }
+
+    .user-avatar-overlay span {
+        font-size: 20px;
+    }
+
+    .user-details h4 {
+        font-size: 1.05rem;
+        color: #084608;
+        font-weight: 700;
+    }
+
+    .user-details p {
+        color: #3a5f3a;
+        font-size: 0.85rem;
+        margin-top: 2px;
+    }
+
+    .user-role-badge {
+        background: linear-gradient(145deg, #d4e8d4, #b8d8b8);
+        padding: 4px 14px;
+        border-radius: 40px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #124012;
+        margin-top: 6px;
+        display: inline-block;
+    }
+
+    /* Alert messages */
+    .settings-alert {
+        padding: 14px 20px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .settings-alert.success {
+        background: #e8f5e8;
+        color: #1a5a1a;
+        border: 1px solid #c0dcc0;
+    }
+
+    .settings-alert.error {
+        background: #fde8e8;
+        color: #8b1a1a;
+        border: 1px solid #f0c0c0;
+    }
+
+    .divider {
+        border: none;
+        border-top: 1px solid #e2ede2;
+        margin: 24px 0;
+    }
+
+    @media (max-width: 600px) {
+        .settings-container {
+            padding: 10px 4px 30px;
+        }
+        .settings-card {
+            padding: 22px 18px;
+            border-radius: 22px;
+        }
+    }
+
+    .settings-tabs {
+        display: flex;
+        gap: 8px;
+        margin: 0 auto 24px auto;
+        width: 100%;
+        max-width: 800px;
+        border-bottom: 1.5px solid #dceadc;
+        padding-bottom: 2px;
+    }
+
+    .tab-btn {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+        background: none;
+        border: none;
+        padding: 10px 16px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #5a7d5a;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+        transition: color 0.3s;
+        outline: none;
+    }
+
+    .tab-btn::after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: #1f5a1f;
+        border-radius: 3px;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .tab-btn:hover {
+        color: #1f5a1f;
+    }
+
+    .tab-btn.active {
+        color: #1f5a1f;
+    }
+
+    .tab-btn.active::after {
+        transform: scaleX(1);
+    }
+    
+    .tab-btn .material-icons {
+        font-size: 18px;
+    }
+    
+    .tab-content {
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="settings-container">
+    <div class="settings-header">
+        <h1><span class="material-icons" style="font-size:32px; vertical-align:middle; margin-right:8px;">admin_panel_settings</span>
+            {% if request.LANGUAGE_CODE == 'sw' %}Mipangilio ya Admin{% else %}Admin Settings{% endif %}
+        </h1>
+        <p>{% if request.LANGUAGE_CODE == 'sw' %}Dhibiti akaunti yako ya admin{% else %}Manage your admin account{% endif %}</p>
+    </div>
+
+    <!-- Tab Navigation Links -->
+    <div class="settings-tabs">
+        <button class="tab-btn active" data-tab="profile-tab" onclick="switchTab('profile-tab', this)">
+            <span class="material-icons">manage_accounts</span>
+            {% if request.LANGUAGE_CODE == 'sw' %}Username na Wasifu{% else %}Username & Profile{% endif %}
+        </button>
+        <button class="tab-btn" data-tab="password-tab" onclick="switchTab('password-tab', this)">
+            <span class="material-icons">lock</span>
+            {% if request.LANGUAGE_CODE == 'sw' %}Badilisha Password{% else %}Change Password{% endif %}
+        </button>
+        <button class="tab-btn" data-tab="customers-tab" onclick="switchTab('customers-tab', this)">
+            <span class="material-icons">groups</span>
+            {% if request.LANGUAGE_CODE == 'sw' %}Dhibiti Wateja{% else %}Manage Customers{% endif %}
+        </button>
+        <button class="tab-btn" data-tab="backup-tab" onclick="switchTab('backup-tab', this)">
+            <span class="material-icons">storage</span>
+            {% if request.LANGUAGE_CODE == 'sw' %}Backup ya Database{% else %}Database Backup{% endif %}
+        </button>
+    </div>
+
+
+
+    <!-- Tab 1: Username & Profile Content -->
+    <div id="profile-tab-content" class="tab-content">
+        <!-- User Profile Card -->
+        <div class="settings-card" style="max-width: 800px; margin: 0 auto 24px auto;">
+            <h3><span class="material-icons">person</span> {% if request.LANGUAGE_CODE == 'sw' %}Taarifa za Akaunti{% else %}Account Information{% endif %}</h3>
+            <div class="user-info">
+                <div class="user-avatar-container" onclick="triggerAvatarUpload()" title="{% if request.LANGUAGE_CODE == 'sw' %}Badilisha picha ya wasifu{% else %}Change profile picture{% endif %}">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" class="user-avatar-img" alt="Profile Picture" />
+                    {% else %}
+                        <div class="user-avatar-letter">{{ user.username|first|upper }}</div>
+                    {% endif %}
+                    <div class="user-avatar-overlay">
+                        <span class="material-icons">photo_camera</span>
+                    </div>
+                </div>
+                
+                <!-- Hidden form for profile picture upload -->
+                <form id="avatarForm" method="post" action="{% url 'admin_settings' %}" enctype="multipart/form-data" style="display:none;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_profile_pic" />
+                    <input type="file" id="avatarInput" name="avatar" accept="image/*" onchange="submitAvatarForm()" />
+                </form>
+                <div class="user-details">
+                    <h4>{{ user.get_full_name|default:user.username }}</h4>
+                    <p>{{ user.email|default:"No email set" }}</p>
+                    <span class="user-role-badge">
+                        <span class="material-icons" style="font-size:12px; vertical-align:middle;">shield</span>
+                        Admin / Superuser
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Username -->
+        <div class="settings-card" style="max-width: 800px; margin: 0 auto 24px auto;">
+            <h3><span class="material-icons">badge</span> {% if request.LANGUAGE_CODE == 'sw' %}Badilisha Username{% else %}Change Username{% endif %}</h3>
+            <form method="post" action="{% url 'admin_settings' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_username" />
+
+                <div class="form-group">
+                    <label for="current_username">
+                        {% if request.LANGUAGE_CODE == 'sw' %}Username ya Sasa{% else %}Current Username{% endif %}
+                    </label>
+                    <input type="text" id="current_username" value="{{ user.username }}" disabled style="background-color: #eef5ee; cursor: not-allowed; border-color: #d2e4d2; color: #5a7d5a;" />
+                </div>
+
+                <div class="form-group">
+                    <label for="new_username">
+                        {% if request.LANGUAGE_CODE == 'sw' %}Username Mpya{% else %}New Username{% endif %}
+                    </label>
+                    <input type="text" id="new_username" name="new_username" required
+                           placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Ingiza username mpya{% else %}Enter new username{% endif %}" />
+                </div>
+
+                <button type="submit" class="settings-btn">
+                    <span class="material-icons">save</span>
+                    {% if request.LANGUAGE_CODE == 'sw' %}Hifadhi Username{% else %}Update Username{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tab 2: Change Password Content -->
+    <div id="password-tab-content" class="tab-content" style="display: none;">
+        <div class="settings-card" style="max-width: 800px; margin: 0 auto 24px auto;">
+            <h3><span class="material-icons">lock</span> {% if request.LANGUAGE_CODE == 'sw' %}Badilisha Password{% else %}Change Password{% endif %}</h3>
+            <form method="post" action="{% url 'admin_settings' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_password" />
+
+                <div class="form-group" style="position: relative;">
+                    <label for="current_password">
+                        {% if request.LANGUAGE_CODE == 'sw' %}Password ya Sasa{% else %}Current Password{% endif %}
+                    </label>
+                    <input type="password" id="current_password" name="current_password" required
+                           placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Ingiza password ya sasa{% else %}Enter current password{% endif %}" style="padding-right: 40px;" />
+                    <span class="material-icons" onclick="togglePasswordVisibility('current_password', this)" style="position: absolute; right: 15px; top: 38px; cursor: pointer; color: #88a888; user-select: none;">visibility</span>
+                </div>
+
+                <div class="form-group" style="position: relative;">
+                    <label for="new_password">
+                        {% if request.LANGUAGE_CODE == 'sw' %}Password Mpya{% else %}New Password{% endif %}
+                    </label>
+                    <input type="password" id="new_password" name="new_password" required
+                           placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Ingiza password mpya{% else %}Enter new password{% endif %}" style="padding-right: 40px;" />
+                    <span class="material-icons" onclick="togglePasswordVisibility('new_password', this)" style="position: absolute; right: 15px; top: 38px; cursor: pointer; color: #88a888; user-select: none;">visibility</span>
+                </div>
+
+                <div class="form-group" style="position: relative;">
+                    <label for="confirm_password">
+                        {% if request.LANGUAGE_CODE == 'sw' %}Thibitisha Password{% else %}Confirm Password{% endif %}
+                    </label>
+                    <input type="password" id="confirm_password" name="confirm_password" required
+                           placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Thibitisha password mpya{% else %}Confirm new password{% endif %}" style="padding-right: 40px;" />
+                    <span class="material-icons" onclick="togglePasswordVisibility('confirm_password', this)" style="position: absolute; right: 15px; top: 38px; cursor: pointer; color: #88a888; user-select: none;">visibility</span>
+                </div>
+
+                <button type="submit" class="settings-btn">
+                    <span class="material-icons">save</span>
+                    {% if request.LANGUAGE_CODE == 'sw' %}Hifadhi Password{% else %}Update Password{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tab 3: Customers Content -->
+    <div id="customers-tab-content" class="tab-content" style="display: none;">
+        <div class="settings-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; gap: 12px; flex-wrap: wrap;">
+                <h3 style="margin-bottom: 0;"><span class="material-icons">groups</span> {% if request.LANGUAGE_CODE == 'sw' %}Dhibiti Wateja{% else %}Manage Customers{% endif %}</h3>
+                <div class="search-box" style="margin: 0; max-width: 280px;">
+                    <button class="search-btn" type="button" onclick="filterAdminCustomers()">
+                        {% if request.LANGUAGE_CODE == 'sw' %}Tafuta{% else %}Search{% endif %}
+                    </button>
+                    <div class="search-divider"></div>
+                    <input type="text" id="adminCustomerSearchInput" onkeypress="if(event.key === 'Enter') filterAdminCustomers()" placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Tafuta jina la mteja...{% else %}Search customer name...{% endif %}" style="font-size: 0.82rem;" />
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr style="border-bottom: 2px solid #eee;">
+                            <th style="width: 50px;">ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Date Joined</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                        <tr style="border-bottom: 1px solid #eee;" class="customer-row">
+                            <td style="padding: 12px; font-weight: bold; color: #5a7d5a;">{{ forloop.counter }}</td>
+                            <td style="padding: 12px;">{{ customer.username }}</td>
+                            <td style="padding: 12px;">{{ customer.email }}</td>
+                            <td style="padding: 12px;">{{ customer.profile.phone|default:"-" }}</td>
+                            <td style="padding: 12px;">{{ customer.date_joined|date:"M d, Y" }}</td>
+                            <td style="padding: 12px; text-align: right; white-space: nowrap;">
+                                <form method="POST" style="display: inline;" data-confirm="{% if request.LANGUAGE_CODE == 'sw' %}Je! Una uhakika unataka {% if customer.is_active %}kumzuia{% else %}kumruhusu{% endif %} huyu mtumiaji kutumia mfumo?{% else %}Are you sure you want to {% if customer.is_active %}block{% else %}unblock{% endif %} this user?{% endif %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="block_customer">
+                                    <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                                    <button type="submit" style="background: {% if customer.is_active %}#FF9800{% else %}#2196F3{% endif %}; color: white; border: none; padding: 4px 8px; font-size: 12px; border-radius: 4px; cursor: pointer; margin-right: 4px;">
+                                        {% if customer.is_active %}Block{% else %}Unblock{% endif %}
+                                    </button>
+                                </form>
+                                <form method="POST" style="display: inline;" data-confirm="{% if request.LANGUAGE_CODE == 'sw' %}Je! Una uhakika unataka kumfuta kabisa mtumiaji huyu kwenye mfumo?{% else %}Are you sure you want to permanently delete this user?{% endif %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_customer">
+                                    <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                                    <button type="submit" style="background: #f44336; color: white; border: none; padding: 4px 8px; font-size: 12px; border-radius: 4px; cursor: pointer;">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="padding: 20px; text-align: center; color: #666;">
+                                {% if request.LANGUAGE_CODE == 'sw' %}Hakuna wateja waliopatikana.{% else %}No customers found.{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 4: Database Backup Content -->
+    <div id="backup-tab-content" class="tab-content" style="display: none;">
+        <div class="settings-card">
+            <h3><span class="material-icons">storage</span> {% if request.LANGUAGE_CODE == 'sw' %}Backup ya Database{% else %}Database Backup{% endif %}</h3>
+            <p style="color: #3a5f3a; margin-bottom: 20px;">
+                {% if request.LANGUAGE_CODE == 'sw' %}Pakua au tengeneza nakala ya hifadhidata (database) kwa ajili ya usalama wa taarifa.{% else %}Download or create a backup of the database for security purposes.{% endif %}
+            </p>
+            
+            <form method="post" action="{% url 'admin_settings' %}" style="margin-bottom: 30px;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_backup" />
+                <button type="submit" class="settings-btn" style="width: auto; display: inline-flex; background: linear-gradient(145deg, #0d47a1, #1976d2);">
+                    <span class="material-icons">add_circle</span>
+                    {% if request.LANGUAGE_CODE == 'sw' %}Tengeneza Backup Mpya{% else %}Create New Backup{% endif %}
+                </button>
+            </form>
+
+            <div class="table-responsive">
+                <table style="width: 100%; text-align: left; border-collapse: collapse; background-color: #e8f5e9; border-radius: 8px; overflow: hidden;">
+                    <thead style="background-color: #c8e6c9;">
+                        <tr>
+                            <th style="padding: 12px; font-weight: bold; color: #1b5e20;">Filename</th>
+                            <th style="padding: 12px; font-weight: bold; color: #1b5e20;">Size</th>
+                            <th style="padding: 12px; font-weight: bold; color: #1b5e20;">Date</th>
+                            <th style="padding: 12px; font-weight: bold; color: #1b5e20;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for backup in backups %}
+                        <tr style="border-bottom: 1px solid #c8e6c9;">
+                            <td style="padding: 12px; color: #2e7d32;">{{ backup.filename }}</td>
+                            <td style="padding: 12px; color: #2e7d32;">{{ backup.size }}</td>
+                            <td style="padding: 12px; color: #2e7d32;">{{ backup.date }}</td>
+                            <td style="padding: 12px; display: flex; gap: 8px;">
+                                <a href="{% url 'download_backup' backup.filename %}" style="background-color: #2e7d32; color: white; padding: 6px 12px; border-radius: 12px; text-decoration: none; font-size: 0.85rem; font-weight: bold; display: inline-block;">
+                                    Download
+                                </a>
+                                <form method="POST" style="display: inline;" data-confirm="{% if request.LANGUAGE_CODE == 'sw' %}Je! Una uhakika unataka kufuta backup hii?{% else %}Are you sure you want to delete this backup?{% endif %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_backup">
+                                    <input type="hidden" name="filename" value="{{ backup.filename }}">
+                                    <button type="submit" style="background-color: #f44336; color: white; padding: 6px 12px; border-radius: 12px; border: none; font-size: 0.85rem; font-weight: bold; cursor: pointer; display: inline-block;">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="padding: 20px; text-align: center; color: #666;">
+                                {% if request.LANGUAGE_CODE == 'sw' %}Hakuna backup yoyote.{% else %}No backups available.{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Customer Modal -->
+    <div id="editCustomerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 30px; border-radius: 8px; width: 90%; max-width: 400px; position: relative;">
+            <h3 style="margin-top: 0; color: #2E7D32;">{% if request.LANGUAGE_CODE == 'sw' %}Hariri Taarifa za Mteja{% else %}Edit Customer Info{% endif %}</h3>
+            <button onclick="closeEditModal()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit_customer">
+                <input type="hidden" name="customer_id" id="edit_customer_id">
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #555; font-weight: 500;">Username</label>
+                    <input type="text" name="username" id="edit_username" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #555; font-weight: 500;">Email</label>
+                    <input type="email" name="email" id="edit_email" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label style="display: block; margin-bottom: 5px; color: #555; font-weight: 500;">Phone</label>
+                    <input type="text" name="phone" id="edit_phone" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+                </div>
+                
+                <button type="submit" style="width: 100%; background: #2E7D32; color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px;">
+                    {% if request.LANGUAGE_CODE == 'sw' %}Hifadhi Mabadiliko{% else %}Save Changes{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// On page load, restore active tab
+document.addEventListener("DOMContentLoaded", function() {
+    const activeTab = localStorage.getItem('admin_active_tab') || 'profile-tab';
+    
+    // Hide all contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Show active content
+    const contentEl = document.getElementById(activeTab + '-content');
+    if (contentEl) {
+        contentEl.style.display = 'block';
+    }
+    
+    // Set active button
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === activeTab) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+});
+
+function switchTab(tabId, btn) {
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show active tab content
+    document.getElementById(tabId + '-content').style.display = 'block';
+    
+    // Add active class to clicked button
+    btn.classList.add('active');
+    
+    // Save to localStorage
+    localStorage.setItem('admin_active_tab', tabId);
+}
+
+function editCustomer(id, username, email, phone) {
+    document.getElementById('edit_customer_id').value = id;
+    document.getElementById('edit_username').value = username;
+    document.getElementById('edit_email').value = email;
+    document.getElementById('edit_phone').value = phone;
+    document.getElementById('editCustomerModal').style.display = 'flex';
+}
+
+function closeEditModal() {
+    document.getElementById('editCustomerModal').style.display = 'none';
+}
+
+function triggerAvatarUpload() {
+    document.getElementById('avatarInput').click();
+}
+
+function submitAvatarForm() {
+    const input = document.getElementById('avatarInput');
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (file.size > 3 * 1024 * 1024) { // 3MB
+            if(typeof showToast !== 'undefined') showToast("{% if request.LANGUAGE_CODE == 'sw' %}Picha uliyochagua ni kubwa mno (inazidi 3MB). Tafadhali chagua picha ndogo zaidi.{% else %}Selected image is too large (exceeds 3MB). Please choose a smaller image.{% endif %}", "error"); else alert("{% if request.LANGUAGE_CODE == 'sw' %}Picha uliyochagua ni kubwa mno (inazidi 3MB). Tafadhali chagua picha ndogo zaidi.{% else %}Selected image is too large (exceeds 3MB). Please choose a smaller image.{% endif %}");
+            input.value = ''; // clear input
+            return;
+        }
+        document.getElementById('avatarForm').submit();
+    }
+}
+
+function filterAdminCustomers() {
+    var input, filter, rows, tdUsername, tdEmail, i, txtValueUser, txtValueEmail;
+    input = document.getElementById("adminCustomerSearchInput");
+    filter = input.value.toLowerCase();
+    rows = document.getElementsByClassName("customer-row");
+    
+    for (i = 0; i < rows.length; i++) {
+        tdUsername = rows[i].getElementsByTagName("td")[1];
+        tdEmail = rows[i].getElementsByTagName("td")[2];
+        
+        if (tdUsername || tdEmail) {
+            txtValueUser = tdUsername ? (tdUsername.textContent || tdUsername.innerText) : "";
+            txtValueEmail = tdEmail ? (tdEmail.textContent || tdEmail.innerText) : "";
+            
+            if (txtValueUser.toLowerCase().indexOf(filter) > -1 || txtValueEmail.toLowerCase().indexOf(filter) > -1) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }       
+    }
+}
+
+function togglePasswordVisibility(inputId, iconElement) {
+    var input = document.getElementById(inputId);
+    if (input) {
+        if (input.type === 'password') {
+            input.type = 'text';
+            iconElement.textContent = 'visibility_off';
+        } else {
+            input.type = 'password';
+            iconElement.textContent = 'visibility';
+        }
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Wasiliana Nasi - PlantMed{% else %}Contact Us - PlantMed{% endif %}{% endblock %}
+{% block content %}
+<div class="hero">
+  <h1>📞 {% if request.LANGUAGE_CODE == 'sw' %}Wasiliana Nasi{% else %}Contact Us{% endif %}</h1>
+  <h3>{% if request.LANGUAGE_CODE == 'sw' %}Wasiliana Nasi Moja kwa Moja{% else %}Get in Touch{% endif %}</h3>
+  <p>{% if request.LANGUAGE_CODE == 'sw' %}Kwa maswali, maoni, au mapendekezo yoyote, jisikie huru kuwasiliana na msimamizi wa mfumo kwa kutumia maelezo ya mawasiliano hapa chini.{% else %}For any inquiries, feedback, or suggestions, feel free to reach out to the system administrator using the contact details below.{% endif %}</p>
+</div>
+
+<div class="id-card">
+  <div style="padding: 20px 10px;">
+    <div style="display:flex; flex-wrap:wrap; gap:24px;">
+      
+      <div style="flex:1; min-width:220px;">
+        <h3 style="color:#0e740e; margin-bottom:16px; font-size:1.1rem; display:flex; align-items:center; gap:8px;">
+          <span class="material-icons" style="color:#2a7a2a;">phone</span> {% if request.LANGUAGE_CODE == 'sw' %}Simu{% else %}Phone{% endif %}
+        </h3>
+        <p style="line-height:1.8; color:#2d572d; font-weight:600;">+255 615 760 298</p>
+      </div>
+
+      <div style="flex:1; min-width:220px;">
+        <h3 style="color:#0e740e; margin-bottom:16px; font-size:1.1rem; display:flex; align-items:center; gap:8px;">
+          <span class="material-icons" style="color:#2a7a2a;">email</span> Barua pepe
+        </h3>
+        <p style="line-height:1.8;"><a href="mailto:saidbinsuleiman5@gmail.com" style="color:#2d572d; font-weight:600; text-decoration:none;">saidbinsuleiman5@gmail.com</a></p>
+      </div>
+
+      <div style="flex:1; min-width:220px;">
+        <h3 style="color:#0e740e; margin-bottom:16px; font-size:1.1rem; display:flex; align-items:center; gap:8px;">
+          <span class="material-icons" style="color:#2a7a2a;">chat</span> WhatsApp
+        </h3>
+        <p style="line-height:1.8;"><a href="https://wa.me/254615760298" target="_blank" style="color:#2d572d; font-weight:600; text-decoration:none;">+255 679 240 298</a></p>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

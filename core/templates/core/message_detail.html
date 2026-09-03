@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Ujumbe - PlantMed{% else %}Message Details - PlantMed{% endif %}{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <h1>💬 {% if request.LANGUAGE_CODE == 'sw' %}Taarifa za Ujumbe{% else %}Message Details{% endif %}</h1>
+  <h3>{% if request.LANGUAGE_CODE == 'sw' %}Kutoka kwa{% else %}From{% endif %}: {{ msg.user.username|default:"Anonymous" }}</h3>
+</div>
+
+<div class="id-card" style="max-width: 800px; margin: 0 auto; margin-bottom: 40px;">
+  <div style="padding: 20px 10px;">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eef2ee; padding-bottom:15px; margin-bottom:20px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="notif-avatar" style="width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,#1f6b1f,#2b9a2b); display:flex; align-items:center; justify-content:center; color:white;">
+          <span class="material-icons" style="font-size:28px;">person</span>
+        </div>
+        <div>
+          <h4 style="margin:0; color:#1a3c34; font-size:1.1rem;">{{ msg.user.username|default:"Anonymous" }}</h4>
+          {% if msg.user and msg.user.email %}
+            <p style="margin:2px 0 0; color:#555; font-size:0.9rem;">{{ msg.user.email }}</p>
+          {% endif %}
+        </div>
+      </div>
+      <div style="text-align:right; color:#888; font-size:0.85rem;">
+        <div style="display:flex; align-items:center; gap:4px; justify-content:flex-end; margin-bottom:4px;">
+          <span class="material-icons" style="font-size:16px;">schedule</span>
+          {{ msg.created_at|date:"d M Y, H:i" }}
+        </div>
+        <div style="display:inline-block; background:#eef7ee; color:#2b7a2b; padding:4px 10px; border-radius:12px; font-weight:600; font-size:0.8rem;">
+          {% if msg.is_read %}{% if request.LANGUAGE_CODE == 'sw' %}Imesomwa{% else %}Read{% endif %}{% else %}{% if request.LANGUAGE_CODE == 'sw' %}Mpya{% else %}New{% endif %}{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 25px;">
+      <h3 style="color:#0e740e; margin-bottom:12px; font-size:1.2rem;">{% if request.LANGUAGE_CODE == 'sw' %}Mada{% else %}Subject{% endif %}: {{ msg.subject }}</h3>
+      <div style="background:#f8fcf8; border:1px solid #cde0cd; border-radius:12px; padding:20px; font-size:1rem; color:#2c3e35; line-height:1.7; white-space:pre-wrap;">{{ msg.body }}</div>
+    </div>
+
+    <div style="text-align:center; margin-top:30px;">
+      <button onclick="window.history.back()" class="btn-primary" style="padding: 12px 28px; border-radius: 30px; font-weight: 600; font-size: 1rem; cursor: pointer; background:#f0f0f0; color:#333; border:none;">
+        <span class="material-icons" style="vertical-align:middle; margin-right:6px;">arrow_back</span>
+        {% if request.LANGUAGE_CODE == 'sw' %}Rudi Nyuma{% else %}Go Back{% endif %}
+      </button>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

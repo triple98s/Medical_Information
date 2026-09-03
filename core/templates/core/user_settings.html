@@ -1,0 +1,523 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Mipangilio{% else %}Settings{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+    .settings-container {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 10px 0 40px;
+    }
+
+    .settings-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .settings-header h1 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #084608;
+        letter-spacing: -0.5px;
+    }
+
+    .settings-header p {
+        color: #3a5f3a;
+        margin-top: 6px;
+        font-size: 0.95rem;
+    }
+
+    .settings-card {
+        background: #ffffff;
+        border-radius: 28px;
+        padding: 28px 32px;
+        box-shadow: 0 8px 32px rgba(20, 60, 20, 0.05);
+        border: 1px solid #dceadc;
+        margin-bottom: 24px;
+    }
+
+    .settings-card h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0e740e;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .settings-card h3 .material-icons {
+        font-size: 24px;
+        color: #2a7a2a;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #1a3a1a;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 14px 20px;
+        border-radius: 16px;
+        border: 2px solid #dceadc;
+        background: #f8fcf8;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #1a2e1a;
+        outline: none;
+        transition: 0.25s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-group input:focus {
+        border-color: #2b7a2b;
+        box-shadow: 0 0 0 4px rgba(40, 130, 40, 0.1);
+        background: #ffffff;
+    }
+
+    .form-group input:disabled {
+        background: #eef5ee;
+        color: #6a8a6a;
+        cursor: not-allowed;
+    }
+
+    .settings-btn {
+        width: 100%;
+        padding: 14px 28px;
+        border-radius: 60px;
+        border: none;
+        background: linear-gradient(145deg, #1f5a1f, #2a7a2a);
+        color: white;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.25s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 8px 20px rgba(30, 80, 30, 0.15);
+        margin-top: 8px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .settings-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(30, 80, 30, 0.22);
+    }
+
+    .settings-btn:active {
+        transform: scale(0.98);
+    }
+
+    /* User info card */
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 18px 0 10px;
+    }
+
+    .user-avatar-container {
+        position: relative;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        cursor: pointer;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(30, 80, 30, 0.15);
+        transition: all 0.3s ease;
+    }
+
+    .user-avatar-container:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(30, 80, 30, 0.25);
+    }
+
+    .user-avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .user-avatar-letter {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #1f5a1f, #3a9a3a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .user-avatar-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 50%;
+    }
+
+    .user-avatar-container:hover .user-avatar-overlay {
+        opacity: 1;
+    }
+
+    .user-avatar-overlay span {
+        font-size: 20px;
+    }
+
+    .user-details h4 {
+        font-size: 1.05rem;
+        color: #084608;
+        font-weight: 700;
+    }
+
+    .user-details p {
+        color: #3a5f3a;
+        font-size: 0.85rem;
+        margin-top: 2px;
+    }
+
+    .user-role-badge {
+        background: linear-gradient(145deg, #e0e0e0, #cfcfcf);
+        padding: 4px 14px;
+        border-radius: 40px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #555;
+        margin-top: 6px;
+        display: inline-block;
+    }
+
+    /* Alert messages */
+    .settings-alert {
+        padding: 14px 20px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .settings-alert.success {
+        background: #e8f5e8;
+        color: #1a5a1a;
+        border: 1px solid #c0dcc0;
+    }
+
+    .settings-alert.error {
+        background: #fde8e8;
+        color: #8b1a1a;
+        border: 1px solid #f0c0c0;
+    }
+
+    @media (max-width: 600px) {
+        .settings-container {
+            padding: 10px 4px 30px;
+        }
+        .settings-card {
+            padding: 22px 18px;
+            border-radius: 22px;
+        }
+    }
+
+    .settings-tabs {
+        display: flex;
+        gap: 8px;
+        margin: 0 auto 24px auto;
+        width: 100%;
+        border-bottom: 1.5px solid #dceadc;
+        padding-bottom: 2px;
+    }
+
+    .tab-btn {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+        background: none;
+        border: none;
+        padding: 10px 16px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #5a7d5a;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+        transition: color 0.3s;
+        outline: none;
+    }
+
+    .tab-btn::after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: #1f5a1f;
+        border-radius: 3px;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .tab-btn:hover {
+        color: #1f5a1f;
+    }
+
+    .tab-btn.active {
+        color: #1f5a1f;
+    }
+
+    .tab-btn.active::after {
+        transform: scaleX(1);
+    }
+    
+    .tab-btn .material-icons {
+        font-size: 18px;
+    }
+    
+    .tab-content {
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="settings-container">
+    <div class="settings-header">
+        <h1><span class="material-icons" style="font-size:32px; vertical-align:middle; margin-right:8px;">settings</span>
+            {% if request.LANGUAGE_CODE == 'sw' %}Mipangilio{% else %}Settings{% endif %}
+        </h1>
+        <p>{% if request.LANGUAGE_CODE == 'sw' %}Dhibiti akaunti yako{% else %}Manage your account{% endif %}</p>
+    </div>
+
+    <!-- Tab Navigation Links -->
+    <div class="settings-tabs">
+        <button class="tab-btn active" data-tab="profile-tab" onclick="switchTab('profile-tab', this)">
+            <span class="material-icons">manage_accounts</span>
+            {% if request.LANGUAGE_CODE == 'sw' %}Username na Wasifu{% else %}Username & Profile{% endif %}
+        </button>
+        <button class="tab-btn" data-tab="password-tab" onclick="switchTab('password-tab', this)">
+            <span class="material-icons">lock</span>
+            {% if request.LANGUAGE_CODE == 'sw' %}Badilisha Password{% else %}Change Password{% endif %}
+        </button>
+    </div>
+
+
+
+    <!-- Tab 1: Username & Profile Content -->
+    <div id="profile-tab-content" class="tab-content">
+        <!-- User Profile Card -->
+        <div class="settings-card">
+            <h3><span class="material-icons">person</span> {% if request.LANGUAGE_CODE == 'sw' %}Taarifa za Akaunti{% else %}Account Information{% endif %}</h3>
+            <div class="user-info">
+                <div class="user-avatar-container" onclick="triggerAvatarUpload()" title="{% if request.LANGUAGE_CODE == 'sw' %}Badilisha picha ya wasifu{% else %}Change profile picture{% endif %}">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" class="user-avatar-img" alt="Profile Picture" />
+                    {% else %}
+                        <div class="user-avatar-letter">{{ user.username|first|upper }}</div>
+                    {% endif %}
+                    <div class="user-avatar-overlay">
+                        <span class="material-icons">photo_camera</span>
+                    </div>
+                </div>
+                
+                <!-- Hidden form for profile picture upload -->
+                <form id="avatarForm" method="post" action="{% url 'user_settings' %}" enctype="multipart/form-data" style="display:none;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_profile_pic" />
+                    <input type="file" id="avatarInput" name="avatar" accept="image/*" onchange="submitAvatarForm()" />
+                </form>
+                <div class="user-details">
+                    <h4>{{ user.get_full_name|default:user.username }}</h4>
+                    <p>{{ user.email|default:"No email set" }}</p>
+                    <span class="user-role-badge">
+                        <span class="material-icons" style="font-size:12px; vertical-align:middle;">person</span>
+                        {% if request.LANGUAGE_CODE == 'sw' %}Mtumiaji wa Kawaida{% else %}Community User{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Username -->
+        <div class="settings-card">
+            <h3><span class="material-icons">badge</span> {% if request.LANGUAGE_CODE == 'sw' %}Badilisha Username{% else %}Change Username{% endif %}</h3>
+            <form method="post" action="{% url 'user_settings' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_username" />
+
+                <div class="form-group">
+                    <label for="current_username">
+                        {% if request.LANGUAGE_CODE == 'sw' %}Username ya Sasa{% else %}Current Username{% endif %}
+                    </label>
+                    <input type="text" id="current_username" value="{{ user.username }}" disabled style="background-color: #eef5ee; cursor: not-allowed; border-color: #d2e4d2; color: #5a7d5a;" />
+                </div>
+
+                <div class="form-group">
+                    <label for="new_username">
+                        {% if request.LANGUAGE_CODE == 'sw' %}Username Mpya{% else %}New Username{% endif %}
+                    </label>
+                    <input type="text" id="new_username" name="new_username" required
+                           placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Ingiza username mpya{% else %}Enter new username{% endif %}" />
+                </div>
+
+
+                <button type="submit" class="settings-btn">
+                    <span class="material-icons">save</span>
+                    {% if request.LANGUAGE_CODE == 'sw' %}Hifadhi Username{% else %}Update Username{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tab 2: Change Password Content -->
+    <div id="password-tab-content" class="tab-content" style="display: none;">
+        <div class="settings-card">
+            <h3><span class="material-icons">lock</span> {% if request.LANGUAGE_CODE == 'sw' %}Badilisha Password{% else %}Change Password{% endif %}</h3>
+            <form method="post" action="{% url 'user_settings' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_password" />
+
+                <div class="form-group" style="position: relative;">
+                    <label for="current_password">
+                        {% if request.LANGUAGE_CODE == 'sw' %}Password ya Sasa{% else %}Current Password{% endif %}
+                    </label>
+                    <input type="password" id="current_password" name="current_password" required
+                           placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Ingiza password ya sasa{% else %}Enter current password{% endif %}" style="padding-right: 40px;" />
+                    <span class="material-icons" onclick="togglePasswordVisibility('current_password', this)" style="position: absolute; right: 15px; top: 38px; cursor: pointer; color: #88a888; user-select: none;">visibility</span>
+                </div>
+
+                <div class="form-group" style="position: relative;">
+                    <label for="new_password">
+                        {% if request.LANGUAGE_CODE == 'sw' %}Password Mpya{% else %}New Password{% endif %}
+                    </label>
+                    <input type="password" id="new_password" name="new_password" required
+                           placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Ingiza password mpya{% else %}Enter new password{% endif %}" style="padding-right: 40px;" />
+                    <span class="material-icons" onclick="togglePasswordVisibility('new_password', this)" style="position: absolute; right: 15px; top: 38px; cursor: pointer; color: #88a888; user-select: none;">visibility</span>
+                </div>
+
+                <div class="form-group" style="position: relative;">
+                    <label for="confirm_password">
+                        {% if request.LANGUAGE_CODE == 'sw' %}Thibitisha Password{% else %}Confirm Password{% endif %}
+                    </label>
+                    <input type="password" id="confirm_password" name="confirm_password" required
+                           placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Thibitisha password mpya{% else %}Confirm new password{% endif %}" style="padding-right: 40px;" />
+                    <span class="material-icons" onclick="togglePasswordVisibility('confirm_password', this)" style="position: absolute; right: 15px; top: 38px; cursor: pointer; color: #88a888; user-select: none;">visibility</span>
+                </div>
+
+                <button type="submit" class="settings-btn">
+                    <span class="material-icons">save</span>
+                    {% if request.LANGUAGE_CODE == 'sw' %}Hifadhi Password{% else %}Update Password{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// On page load, restore active tab
+document.addEventListener("DOMContentLoaded", function() {
+    const activeTab = localStorage.getItem('user_active_tab') || 'profile-tab';
+    
+    // Hide all contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Show active content
+    const contentEl = document.getElementById(activeTab + '-content');
+    if (contentEl) {
+        contentEl.style.display = 'block';
+    }
+    
+    // Set active button
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === activeTab) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+});
+
+function switchTab(tabId, btn) {
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show active tab content
+    document.getElementById(tabId + '-content').style.display = 'block';
+    
+    // Add active class to clicked button
+    btn.classList.add('active');
+    
+    // Save to localStorage
+    localStorage.setItem('user_active_tab', tabId);
+}
+
+function triggerAvatarUpload() {
+    document.getElementById('avatarInput').click();
+}
+
+function submitAvatarForm() {
+    const input = document.getElementById('avatarInput');
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (file.size > 3 * 1024 * 1024) { // 3MB
+            if(typeof showToast !== 'undefined') showToast("{% if request.LANGUAGE_CODE == 'sw' %}Picha uliyochagua ni kubwa mno (inazidi 3MB). Tafadhali chagua picha ndogo zaidi.{% else %}Selected image is too large (exceeds 3MB). Please choose a smaller image.{% endif %}", "error"); else alert("{% if request.LANGUAGE_CODE == 'sw' %}Picha uliyochagua ni kubwa mno (inazidi 3MB). Tafadhali chagua picha ndogo zaidi.{% else %}Selected image is too large (exceeds 3MB). Please choose a smaller image.{% endif %}");
+            input.value = ''; // clear input
+            return;
+        }
+        document.getElementById('avatarForm').submit();
+    }
+}
+
+function togglePasswordVisibility(inputId, iconElement) {
+    var input = document.getElementById(inputId);
+    if (input) {
+        if (input.type === 'password') {
+            input.type = 'text';
+            iconElement.textContent = 'visibility_off';
+        } else {
+            input.type = 'password';
+            iconElement.textContent = 'visibility';
+        }
+    }
+}
+</script>
+{% endblock %}

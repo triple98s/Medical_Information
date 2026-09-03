@@ -1,0 +1,24 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Kuhusu Sisi - PlantMed{% else %}About Us - PlantMed{% endif %}{% endblock %}
+{% block content %}
+<div class="hero">
+  <h1>🌿 {% if request.LANGUAGE_CODE == 'sw' %}Kuhusu PlantMed{% else %}About PlantMed{% endif %}</h1>
+  <h3>{% if request.LANGUAGE_CODE == 'sw' %}Utambuzi wa Aina ya Mimea na Taarifa za Dawa{% else %}Plant Species Identification with Medicine Information{% endif %}</h3>
+  <p>{% if request.LANGUAGE_CODE == 'sw' %}PlantMed ni mfumo unaotumia akili bandia kuwasaidia watumiaji kutambua aina za mimea na kugundua matumizi yake ya dawa. 
+  Pakia picha au tafuta kwa jina la mmea kupata taarifa za kina kuhusu jina la asili la mmea, jina la kisayansi, 
+  jina la kawaida, na matumizi yake ya asili ya dawa.{% else %}PlantMed is an AI-based system designed to help users identify plant species and discover their medicinal uses. 
+  Upload an image or search by plant name to get detailed information about the plant's local name, scientific name, 
+  common name, and its traditional medicinal applications.{% endif %}</p>
+</div>
+
+<div class="id-card">
+  <div style="padding: 20px 10px;">
+    <h3 style="color:#0e740e; margin-bottom:16px; font-size:1.1rem;">🎯 {% if request.LANGUAGE_CODE == 'sw' %}Dhamira Yetu{% else %}Our Mission{% endif %}</h3>
+    <p style="line-height:1.8; color:#2d572d;">{% if request.LANGUAGE_CODE == 'sw' %}Kuziba pengo kati ya maarifa ya asili ya mimea na teknolojia ya kisasa, 
+    kufanya utambuzi wa mimea na taarifa za dawa kupatikana kwa kila mtu.{% else %}To bridge the gap between traditional plant knowledge and modern technology, 
+    making plant identification and medicinal information accessible to everyone.{% endif %}</p>
+    
+    
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,395 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Kitambulisho cha Mimea · Dawa{% else %}Plant Species ID · Medicine{% endif %}{% endblock %}
+{% block content %}
+    <!-- HERO -->
+    <div class="hero">
+      <h1>{% if request.LANGUAGE_CODE == 'sw' %}Utambuzi wa Aina ya Mimea{% else %}Plant Species Identification{% endif %} </h1>
+      <h3>{% if request.LANGUAGE_CODE == 'sw' %}na Taarifa za Dawa{% else %}with Medicine Information{% endif %}</h3>
+      <p>{% if request.LANGUAGE_CODE == 'sw' %}Tambua mimea kwa kutumia picha au kwa kutafuta jina lake na upate taarifa za kina kuhusu matumizi yake ya kidawa.{% else %}Identify plants using images or by searching their name and get detailed information about their medicinal uses.{% endif %}</p>
+    </div>
+
+    <!-- INLINE MESSAGE CONTAINER -->
+    <div id="inlineMessageContainer" style="display: none; max-width: 900px; margin: 0 auto 24px; padding: 16px 20px; border-radius: 12px; font-weight: 600; text-align: center; font-size: 1.05rem;"></div>
+
+    {% if user.is_authenticated and user.is_superuser %}
+        <!-- ADMIN DASHBOARD -->
+        <div class="admin-dashboard">
+            <!-- STATS CARDS -->
+            <div style="display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap;">
+                <div class="admin-card" style="flex: 1; min-width: 250px; display: flex; align-items: center; gap: 16px; padding: 20px;">
+                    <div style="background: #e8f5e9; color: #2e7d32; padding: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-icons" style="font-size: 32px;">group</span>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; color: #5a7d5a; font-size: 1rem;">{% if request.LANGUAGE_CODE == 'sw' %}Watumiaji Waliosajiliwa{% else %}Registered Users{% endif %}</h4>
+                        <p style="margin: 5px 0 0; font-size: 1.8rem; font-weight: 700; color: #1a3a1a;">{{ user_count }}</p>
+                    </div>
+                </div>
+                <div class="admin-card" style="flex: 1; min-width: 250px; display: flex; align-items: center; gap: 16px; padding: 20px;">
+                    <div style="background: #e8f5e9; color: #2e7d32; padding: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-icons" style="font-size: 32px;">local_florist</span>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; color: #5a7d5a; font-size: 1rem;">{% if request.LANGUAGE_CODE == 'sw' %}Mimea Iliyosajiliwa{% else %}Registered Plants{% endif %}</h4>
+                        <p style="margin: 5px 0 0; font-size: 1.8rem; font-weight: 700; color: #1a3a1a;">{{ plant_count }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-grid">
+                <!-- FORM CARD -->
+                <div class="admin-card form-card">
+                    <h3>
+                        <span class="material-icons">spa</span>
+                        {% if edit_instance %}
+                            {% if request.LANGUAGE_CODE == 'sw' %}Hariri Taarifa za Mmea{% else %}Edit Plant Information{% endif %}
+                        {% else %}
+                            {% if request.LANGUAGE_CODE == 'sw' %}Sajili Mmea Mpya{% else %}Register New Plant{% endif %}
+                        {% endif %}
+                    </h3>
+                    
+
+                    
+                    <form method="post" enctype="multipart/form-data" action="{% url 'home' %}{% if edit_instance %}?edit={{ edit_instance.id }}{% endif %}" class="premium-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="save_plant" />
+                        
+                        <!-- Section 1: Basic Info -->
+                        <div class="form-section-title">
+                            <span class="material-icons">info</span>
+                            {% if request.LANGUAGE_CODE == 'sw' %}Taarifa za Msingi{% else %}Basic Info{% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_scientific_name">
+                                <span class="material-icons label-icon">science</span>
+                                {% if request.LANGUAGE_CODE == 'sw' %}Jina la Kisayansi (Scientific Name){% else %}Scientific Name{% endif %} <span class="required">*</span>
+                            </label>
+                            {{ form.scientific_name }}
+                            {{ form.scientific_name.errors }}
+                        </div>
+                        
+                        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                            <div class="form-group" style="flex: 1; min-width: 150px;">
+                                <label for="id_local_name">
+                                    <span class="material-icons label-icon">label</span>
+                                    {% if request.LANGUAGE_CODE == 'sw' %}Jina la Asili (Local Name){% else %}Local Name{% endif %} <span class="required">*</span>
+                                </label>
+                                {{ form.local_name }}
+                                {{ form.local_name.errors }}
+                            </div>
+                            <div class="form-group" style="flex: 1; min-width: 150px;">
+                                <label for="id_common_name">
+                                    <span class="material-icons label-icon">bookmark_border</span>
+                                    {% if request.LANGUAGE_CODE == 'sw' %}Jina la Kawaida (Common Name){% else %}Common Name{% endif %} <span class="required">*</span>
+                                </label>
+                                {{ form.common_name }}
+                                {{ form.common_name.errors }}
+                            </div>
+                        </div>
+                        
+                        <!-- Section 2: Detailed Description with Language Tabs -->
+                        <div class="form-section-title" style="margin-top: 24px;">
+                            <span class="material-icons">description</span>
+                            {% if request.LANGUAGE_CODE == 'sw' %}Maelezo ya Kina{% else %}Detailed Description{% endif %}
+                        </div>
+                        
+                        <div class="form-lang-tabs">
+                            <button type="button" class="form-tab-btn active" id="form-tab-sw" onclick="switchFormLang('sw')">
+                                <span class="material-icons">translate</span> Kiswahili
+                            </button>
+                            <button type="button" class="form-tab-btn" id="form-tab-en" onclick="switchFormLang('en')">
+                                <span class="material-icons">public</span> English
+                            </button>
+                        </div>
+                        
+                        <!-- SW CONTENT -->
+                        <div id="form-lang-sw-content" class="form-tab-content active">
+                            <div class="form-group">
+                                <label for="id_benefits_sw">
+                                    <span class="material-icons label-icon">volunteer_activism</span>
+                                    Faida na Umuhimu <span class="required">*</span>
+                                </label>
+                                {{ form.benefits_sw }}
+                                {{ form.benefits_sw.errors }}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_medicinal_uses_sw">
+                                    <span class="material-icons label-icon">healing</span>
+                                    Matumizi ya Dawa <span class="required">*</span>
+                                </label>
+                                {{ form.medicinal_uses_sw }}
+                                {{ form.medicinal_uses_sw.errors }}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="id_precautions_sw">
+                                    <span class="material-icons label-icon">warning</span>
+                                    Tahadhari
+                                </label>
+                                {{ form.precautions_sw }}
+                                {{ form.precautions_sw.errors }}
+                            </div>
+                        </div>
+                        
+                        <!-- EN CONTENT -->
+                        <div id="form-lang-en-content" class="form-tab-content" style="display:none;">
+                            <div class="form-group">
+                                <label for="id_benefits_en">
+                                    <span class="material-icons label-icon">volunteer_activism</span>
+                                    Benefits & Importance <span class="required">*</span>
+                                </label>
+                                {{ form.benefits_en }}
+                                {{ form.benefits_en.errors }}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_medicinal_uses_en">
+                                    <span class="material-icons label-icon">healing</span>
+                                    Medicinal Uses <span class="required">*</span>
+                                </label>
+                                {{ form.medicinal_uses_en }}
+                                {{ form.medicinal_uses_en.errors }}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="id_precautions_en">
+                                    <span class="material-icons label-icon">warning</span>
+                                    Precautions
+                                </label>
+                                {{ form.precautions_en }}
+                                {{ form.precautions_en.errors }}
+                            </div>
+                        </div>
+
+                        
+                        <div class="form-actions-sticky" style="display:flex; gap:12px; margin-top:24px;">
+                            <button type="submit" class="premium-save-btn" style="flex:1;">
+                                <span class="material-icons">check_circle</span>
+                                {% if edit_instance %}
+                                    {% if request.LANGUAGE_CODE == 'sw' %}Sasisha Taarifa{% else %}Update Plant{% endif %}
+                                {% else %}
+                                    {% if request.LANGUAGE_CODE == 'sw' %}Hifadhi Mmea{% else %}Save Plant{% endif %}
+                                {% endif %}
+                            </button>
+                                <a href="{% url 'home' %}" class="premium-cancel-btn" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+                                    <span class="material-icons">cancel</span>
+                                    {% if request.LANGUAGE_CODE == 'sw' %}Ghairi{% else %}Cancel{% endif %}
+                                </a>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- LIST CARD -->
+                <div class="admin-card list-card" style="flex: 1.3;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; gap: 12px; flex-wrap: wrap;">
+                        <h3>
+                            <span class="material-icons">list_alt</span>
+                            {% if request.LANGUAGE_CODE == 'sw' %}Orodha ya Mimea ya Dawa{% else %}Medicinal Plants Directory{% endif %}
+                        </h3>
+                        <div class="search-box" style="margin: 0; max-width: 350px;">
+                            <button class="search-btn" type="button" onclick="filterAdminPlants()">
+                                {% if request.LANGUAGE_CODE == 'sw' %}Tafuta{% else %}Search{% endif %}
+                            </button>
+                            <div class="search-divider"></div>
+                            <input type="text" id="adminSearchInput" onkeypress="if(event.key === 'Enter') filterAdminPlants()" placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Tafuta mmea hapa...{% else %}Search Plant here...{% endif %}" />
+                        </div>
+                    </div>
+                    
+                    <div class="plants-list-container" id="plantsListContainer">
+                        {% for plant in plants %}
+                            <div class="admin-plant-row" data-name="{{ plant.local_name|lower }} {{ plant.scientific_name|lower }} {{ plant.common_name|lower }}">
+                                <div class="admin-plant-img">
+                                    <div class="admin-plant-placeholder"><span class="material-icons">spa</span></div>
+                                </div>
+                                <div class="admin-plant-info">
+                                    <h4>{{ plant.local_name }}</h4>
+                                    <p class="sci-name"><em>{{ plant.scientific_name }}</em> {% if plant.common_name %}({{ plant.common_name }}){% endif %}</p>
+                                    <p class="details-snippet">
+                                        <strong>{% if request.LANGUAGE_CODE == 'sw' %}Matibabu:{% else %}Uses:{% endif %}</strong> 
+                                        {% if request.LANGUAGE_CODE == 'sw' %}{{ plant.medicinal_uses_sw|truncatechars:85 }}{% else %}{{ plant.medicinal_uses_en|truncatechars:85 }}{% endif %}
+                                    </p>
+                                </div>
+                                <div class="admin-plant-actions">
+                                    <a href="?edit={{ plant.id }}" class="action-btn edit-btn" title="{% if request.LANGUAGE_CODE == 'sw' %}Hariri{% else %}Edit{% endif %}">
+                                        <span class="material-icons">edit</span>
+                                    </a>
+                                    <button type="button" class="action-btn delete-btn" onclick="confirmDelete('{{ plant.id }}', '{{ plant.local_name }}')" title="{% if request.LANGUAGE_CODE == 'sw' %}Futa{% else %}Delete{% endif %}">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div style="text-align:center; padding: 40px; color: #5a7d5a;">
+                                <span class="material-icons" style="font-size:48px;">info_outline</span>
+                                <p style="margin-top: 10px;">{% if request.LANGUAGE_CODE == 'sw' %}Hakuna mimea iliyosajiliwa bado.{% else %}No plants registered yet.{% endif %}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Delete Confirmation Modal -->
+        <div class="modal-overlay" id="deleteModal">
+            <div class="modal-card">
+                <h3>{% if request.LANGUAGE_CODE == 'sw' %}Futa Mmea{% else %}Delete Plant{% endif %}</h3>
+                <p>{% if request.LANGUAGE_CODE == 'sw' %}Je, una uhakika unataka kufuta mmea huu kutoka kwenye mfumo? Kitendo hiki hakiwezi kurejeshwa.{% else %}Are you sure you want to delete this plant from the system? This action cannot be undone.{% endif %}</p>
+                <div style="margin: 15px 0 20px; font-weight:700; color:#8b1a1a; font-size:1.1rem; text-align:center; background:#fde8e8; padding:12px; border-radius:12px; border:1px solid #f5c2c2;" id="deletePlantName"></div>
+                <form id="deleteForm" method="post" action="{% url 'home' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete_plant" />
+                    <input type="hidden" name="plant_id" id="deletePlantId" value="" />
+                    <div style="display:flex; justify-content:flex-end; gap:12px;">
+                        <button type="button" class="settings-btn" onclick="closeDeleteModal()" style="margin-top:0; border-radius:40px; padding:10px 22px; background:linear-gradient(145deg, #e0eae0, #c8dcc8); color:#1f5a1f; box-shadow:none; width:auto;">
+                            {% if request.LANGUAGE_CODE == 'sw' %}Ghairi{% else %}Cancel{% endif %}
+                        </button>
+                        <button type="submit" class="settings-btn" style="margin-top:0; border-radius:40px; padding:10px 22px; background:linear-gradient(145deg, #c62828, #e53935); color:white; width:auto; display:flex; align-items:center; gap:6px;">
+                            <span class="material-icons" style="font-size:18px;">delete</span>
+                            {% if request.LANGUAGE_CODE == 'sw' %}Futa{% else %}Delete{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            function filterAdminPlants() {
+                const query = document.getElementById('adminSearchInput').value.toLowerCase().trim();
+                const rows = document.querySelectorAll('.admin-plant-row');
+                rows.forEach(row => {
+                    const searchableText = row.getAttribute('data-name');
+                    if (searchableText.includes(query)) {
+                        row.style.display = 'flex';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+            
+            function confirmDelete(id, name) {
+                document.getElementById('deletePlantId').value = id;
+                document.getElementById('deletePlantName').textContent = name;
+                document.getElementById('deleteModal').classList.add('active');
+            }
+            
+            function closeDeleteModal() {
+                document.getElementById('deleteModal').classList.remove('active');
+            }
+
+            function switchFormLang(lang) {
+                if (lang === 'sw') {
+                    document.getElementById('form-lang-sw-content').style.display = 'block';
+                    document.getElementById('form-lang-en-content').style.display = 'none';
+                    document.getElementById('form-tab-sw').classList.add('active');
+                    document.getElementById('form-tab-en').classList.remove('active');
+                } else {
+                    document.getElementById('form-lang-sw-content').style.display = 'none';
+                    document.getElementById('form-lang-en-content').style.display = 'block';
+                    document.getElementById('form-tab-sw').classList.remove('active');
+                    document.getElementById('form-tab-en').classList.add('active');
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                // If there are errors in English fields, switch to English tab automatically
+                const enUsesHasError = document.getElementById('id_medicinal_uses_en')?.nextElementSibling?.classList.contains('errorlist') || false;
+                const enBenefitsHasError = document.getElementById('id_benefits_en')?.nextElementSibling?.classList.contains('errorlist') || false;
+                if (enUsesHasError || enBenefitsHasError) {
+                    switchFormLang('en');
+                }
+
+                // Add interactive upload listener
+                const fileInput = document.querySelector('.file-input-wrapper input[type="file"]');
+                const uploadCard = document.querySelector('.custom-file-upload-card');
+                const placeholder = document.getElementById('uploadPlaceholder');
+
+                if (fileInput && uploadCard) {
+                    fileInput.addEventListener('change', function() {
+                        if (fileInput.files && fileInput.files[0]) {
+                            const fileName = fileInput.files[0].name;
+                            if (placeholder) {
+                                placeholder.innerHTML = `
+                                    <span class="material-icons icon" style="color: #2a7a2a;">insert_drive_file</span>
+                                    <p class="title" style="color: #1a3a1a; font-weight: 700;">\${fileName}</p>
+                                    <p class="subtitle">Bofya kubadilisha faili</p>
+                                `;
+                            }
+                        }
+                    });
+                    uploadCard.addEventListener('click', function() {
+                        fileInput.click();
+                    });
+                }
+            });
+        </script>
+    {% else %}
+        <!-- ORIGINAL VISITOR VIEW -->
+        <!-- IDENTIFICATION CARD -->
+        <div class="id-card">
+          <div class="id-grid">
+            <div class="id-option">
+              <label>📤 {% if request.LANGUAGE_CODE == 'sw' %}Pakia Picha{% else %}Upload Image{% endif %}</label>
+              <button class="btn-large" id="uploadBtn"><span class="material-icons">cloud_upload</span> {% if request.LANGUAGE_CODE == 'sw' %}Pakia Picha ya Mmea{% else %}Upload Plant Image{% endif %}</button>
+            </div>
+            <div class="id-option">
+              <label>📸 {% if request.LANGUAGE_CODE == 'sw' %}Chukua Picha{% else %}Take Photo{% endif %}</label>
+              <button class="btn-large" id="cameraBtn"><span class="material-icons">camera_alt</span> {% if request.LANGUAGE_CODE == 'sw' %}Fungua Kamera{% else %}Open Camera{% endif %}</button>
+            </div>
+            <div class="id-option" style="flex:3;">
+              <label>🔍 {% if request.LANGUAGE_CODE == 'sw' %}Tafuta kwa Jina la Mmea{% else %}Search by Plant Name{% endif %}</label>
+              <div class="search-box">
+                <button class="search-btn" id="searchPlantBtn">
+                  {% if request.LANGUAGE_CODE == 'sw' %}Tafuta{% else %}Search{% endif %}
+                </button>
+                <div class="search-divider"></div>
+                <input type="text" placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Tafuta mmea...{% else %}Search Plant...{% endif %}" id="plantSearchInput" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESULT CARD -->
+        <div class="result-card visible" id="resultCard">
+          <!-- Pass authentication status to JavaScript -->
+          <input type="hidden" id="isAuthenticated" value="{% if user.is_authenticated %}true{% else %}false{% endif %}" />
+          <input type="hidden" id="registerUrl" value="{% url 'register' %}" />
+          
+          <!-- Title explicitly for Print and PDF -->
+          <h2 class="print-only-title" style="display:none; text-align:center; color:#1f5a1f; margin-bottom:24px; font-size:1.5rem; border-bottom: 2px solid #e0eae0; padding-bottom: 15px;">
+            Plant Species Identification with Medicine Information System (PSIMIS)
+          </h2>
+
+          <div class="result-grid">
+            <div class="image-column" style="display:flex; flex-direction:column; gap:14px; flex: 0 0 160px;">
+                <div class="result-img" id="resultImage" style="flex:none;">
+                <span class="material-icons" style="font-size:64px;" id="defaultIcon">spa</span>
+                </div>
+                <button class="btn-primary" id="identifyBtn" style="padding:10px 16px; border-radius:60px; font-weight:700; width:100%; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer; margin-top: 10px;">
+                    <span class="material-icons">travel_explore</span> {% if request.LANGUAGE_CODE == 'sw' %}Tambua Mmea{% else %}Identify Plant{% endif %}
+                </button>
+            </div>
+            <div class="result-details" id="resultDetails">
+              <h3>{% if request.LANGUAGE_CODE == 'sw' %}Jina la Asili:{% else %}Local Name:{% endif %} <span id="localNameTitle"></span></h3>
+              <div class="sub"><strong>{% if request.LANGUAGE_CODE == 'sw' %}Jina la Kisayansi:{% else %}Scientific Name:{% endif %}</strong> <span id="sciNameText"></span> &nbsp; <strong>{% if request.LANGUAGE_CODE == 'sw' %}Jina la Kawaida:{% else %}Common Name:{% endif %}</strong> <span id="comNameText"></span></div>
+              
+              <div style="margin: 14px 0 8px;" id="medUsesContainer">
+                <span class="med-tag">🌿 {% if request.LANGUAGE_CODE == 'sw' %}Matumizi ya dawa{% else %}Medicinal uses{% endif %}</span>
+              </div>
+
+              <div class="result-actions">
+                <button id="saveBtn"><span class="material-icons">save</span> {% if request.LANGUAGE_CODE == 'sw' %}Hifadhi{% else %}Save{% endif %}</button>
+                <button id="printBtn"><span class="material-icons">print</span> {% if request.LANGUAGE_CODE == 'sw' %}Chapisha{% else %}Print{% endif %}</button>
+
+                <button id="shareBtn"><span class="material-icons">share</span> {% if request.LANGUAGE_CODE == 'sw' %}Shiriki{% else %}Share{% endif %}</button>
+              </div>
+              
+              <button class="btn-secondary" id="cancelResultBtn" style="padding:10px 24px; border-radius:60px; font-weight:700; width:fit-content; margin: 20px 0 0 auto; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer; background-color: #fce4e4; color: #d32f2f; border: none;">
+                  <span class="material-icons">cancel</span> {% if request.LANGUAGE_CODE == 'sw' %}Futa Taarifa{% else %}Clear Results{% endif %}
+              </button>
+            </div>
+          </div>
+        </div>
+    {% endif %}
+{% endblock %}

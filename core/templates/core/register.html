@@ -1,0 +1,499 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    /* reset & base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: #eef2f6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated Background Blobs */
+    .blob {
+      position: absolute;
+      filter: blur(90px);
+      z-index: -1;
+      opacity: 0.5;
+      border-radius: 50%;
+      animation: float 12s infinite ease-in-out alternate;
+    }
+
+    .blob-1 {
+      width: 450px;
+      height: 450px;
+      background: #34d399;
+      top: -100px;
+      left: -150px;
+    }
+
+    .blob-2 {
+      width: 400px;
+      height: 400px;
+      background: #3b82f6;
+      bottom: -50px;
+      right: -100px;
+      animation-delay: -6s;
+      opacity: 0.4;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      100% {
+        transform: translate(40px, 60px) scale(1.1);
+      }
+    }
+
+    form {
+      width: 100%;
+      max-width: 540px;
+    }
+
+    .input_row {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .main_container {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      padding: 2rem 2rem 1.8rem;
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      position: relative;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+    }
+
+    .main_container:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+    }
+
+    .heading {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .heading h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #111827;
+      background: linear-gradient(135deg, #10b981, #2563eb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .heading p {
+      font-size: 0.95rem;
+      color: #64748b;
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    .input_group {
+      position: relative;
+      margin-bottom: 1rem;
+      width: 100%;
+    }
+
+    .input_group input {
+      width: 100%;
+      padding: 1.2rem 1rem 0.4rem 2.6rem;
+      font-size: 0.95rem;
+      background: rgba(255, 255, 255, 0.6);
+      border: 2px solid rgba(226, 232, 240, 0.6);
+      border-radius: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+      color: #1e293b;
+      font-weight: 600;
+      height: 3.2rem;
+    }
+
+    .input_group input:-webkit-autofill,
+    .input_group input:-webkit-autofill:hover,
+    .input_group input:-webkit-autofill:focus,
+    .input_group input:-webkit-autofill:active {
+      transition: background-color 5000s ease-in-out 0s;
+      -webkit-text-fill-color: #1e293b !important;
+    }
+
+    .input_group input:focus {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+    }
+
+    .input_group input:user-invalid {
+      border-color: #ef4444;
+    }
+
+    .input_group .icon {
+      position: absolute;
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 1.2rem;
+      transition: color 0.3s ease;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .input_group input:focus~.icon,
+    .input_group input:not(:placeholder-shown)~.icon {
+      color: #10b981;
+    }
+
+    .input_group label {
+      position: absolute;
+      left: 3rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      font-weight: 500;
+      color: #64748b;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .input_group input:focus~label,
+    .input_group input:not(:placeholder-shown)~label {
+      top: 0.7rem;
+      font-size: 0.75rem;
+      color: #10b981;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: white;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 15px -4px rgba(16, 185, 129, 0.4);
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      height: 3.2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button[type="submit"]::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: skewX(-20deg);
+      transition: all 0.5s ease;
+    }
+
+    button[type="submit"]:hover::after {
+      left: 150%;
+    }
+
+    button[type="submit"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 25px -5px rgba(16, 185, 129, 0.5);
+    }
+
+    button[type="submit"]:active {
+      transform: translateY(1px);
+      box-shadow: 0 5px 10px -3px rgba(16, 185, 129, 0.4);
+    }
+
+    a.back-link {
+      display: inline-block;
+      text-align: center;
+      width: 100%;
+      color: #64748b;
+      font-weight: 500;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    a.back-link span {
+      color: #2563eb;
+      font-weight: 700;
+    }
+
+    a.back-link:hover {
+      color: #1e293b;
+    }
+
+    a.back-link:hover span {
+      color: #1d4ed8;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    /* ===== GO BACK BUTTON ===== */
+    .go-back-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.2rem;
+    }
+
+    .go-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.6rem 1.5rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 9999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .go-back-btn:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .go-back-btn:active {
+      transform: translateY(0);
+    }
+
+    .field-error {
+      color: #ef4444;
+      font-size: 0.78rem;
+      margin-top: 4px;
+      padding-left: 4px;
+      font-weight: 500;
+    }
+
+    @media (max-width: 500px) {
+      .main_container {
+        padding: 1.8rem 1.5rem;
+        border-radius: 16px;
+      }
+
+      .input_row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <form method="post" action="{% url 'register' %}">
+    {% csrf_token %}
+    {% if request.GET.next %}
+    <input type="hidden" name="next" value="{{ request.GET.next }}">
+    {% endif %}
+    <div class="main_container">
+      <div class="heading">
+        <h2>{% if request.LANGUAGE_CODE == 'sw' %}Tengeneza Akaunti{% else %}Create Account{% endif %}</h2>
+
+      </div>
+
+
+      <!-- First name -->
+      <div class="input_group" style="margin-bottom: 0.2rem;">
+        <input type="text" id="first-name" name="first_name" placeholder=" " required
+          value="{{ form.first_name.value|default_if_none:'' }}" {% if form.first_name.errors
+          %}style="border-color:#ef4444;" {% endif %}>
+        <i class="fas fa-user icon"></i>
+        <label for="first-name">{% if request.LANGUAGE_CODE == 'sw' %}Jina la Kwanza{% else %}First name{% endif
+          %}</label>
+      </div>
+      {% for error in form.first_name.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
+        error }}</div>{% endfor %}
+
+      <!-- Last name -->
+      <div class="input_group" style="margin-top: 0.8rem; margin-bottom: 0.2rem;">
+        <input type="text" id="last-name" name="last_name" placeholder=" " required
+          value="{{ form.last_name.value|default_if_none:'' }}" {% if form.last_name.errors
+          %}style="border-color:#ef4444;" {% endif %}>
+        <i class="fas fa-user icon"></i>
+        <label for="last-name">{% if request.LANGUAGE_CODE == 'sw' %}Jina la Mwisho{% else %}Last name{% endif
+          %}</label>
+      </div>
+      {% for error in form.last_name.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
+        error }}</div>{% endfor %}
+
+      <div class="input_row" style="margin-top: 0.8rem;">
+        <!-- Phone -->
+        <div style="width: 100%;">
+          <div class="input_group" style="margin-bottom: 0.2rem;">
+            <input type="text" id="phone" name="phone" placeholder=" " required
+              value="{{ form.phone.value|default_if_none:'' }}" {% if form.phone.errors %}style="border-color:#ef4444;"
+              {% endif %}>
+            <i class="fas fa-phone icon"></i>
+            <label for="phone">{% if request.LANGUAGE_CODE == 'sw' %}Namba ya Simu{% else %}Phone number{% endif
+              %}</label>
+          </div>
+          {% for error in form.phone.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
+            error }}</div>{% endfor %}
+        </div>
+
+        <!-- Email -->
+        <div style="width: 100%;">
+          <div class="input_group" style="margin-bottom: 0.2rem;">
+            <input type="email" id="email" name="email" placeholder=" " required
+              value="{{ form.email.value|default_if_none:'' }}" {% if form.email.errors %}style="border-color:#ef4444;"
+              {% endif %}>
+            <i class="fas fa-envelope icon"></i>
+            <label for="email">{% if request.LANGUAGE_CODE == 'sw' %}Barua pepe{% else %}Email address{% endif
+              %}</label>
+          </div>
+          {% for error in form.email.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
+            error }}</div>{% endfor %}
+        </div>
+      </div>
+
+      <div class="input_row" style="margin-top: 0.8rem;">
+        <!-- Gender -->
+        <div style="width: 100%;">
+          <div class="input_group" style="margin-bottom: 0.2rem; position: relative;">
+            <select id="gender" name="gender" required
+              style="width: 100%; padding: 1.2rem 2.6rem 0.4rem 3.0rem; font-size: 0.95rem; background: rgba(255, 255, 255, 0.6); border: 2px solid rgba(226, 232, 240, 0.6); border-radius: 12px; height: 3.2rem; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); color: #1e293b; font-weight: 600; appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; {% if form.gender.errors %}border-color:#ef4444;{% endif %}">
+              <option value="" disabled {% if not form.gender.value %}selected{% endif %}>{% if request.LANGUAGE_CODE ==
+                'sw' %}Chagua Jinsia{% else %}Select Gender{% endif %}</option>
+              <option value="M" {% if form.gender.value=='M' %}selected{% endif %}>{% if request.LANGUAGE_CODE == 'sw'
+                %}Mwanaume{% else %}Male{% endif %}</option>
+              <option value="F" {% if form.gender.value=='F' %}selected{% endif %}>{% if request.LANGUAGE_CODE == 'sw'
+                %}Mwanamke{% else %}Female{% endif %}</option>
+            </select>
+            <i class="fas fa-users icon"></i>
+            <i class="fas fa-chevron-down"
+              style="position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; font-size: 0.9rem; transition: color 0.3s ease;"></i>
+          </div>
+          {% for error in form.gender.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
+            error }}</div>{% endfor %}
+        </div>
+
+        <!-- Address -->
+        <div style="width: 100%;">
+          <div class="input_group" style="margin-bottom: 0.2rem;">
+            <input type="text" id="address" name="address" placeholder=" " required
+              value="{{ form.address.value|default_if_none:'' }}" {% if form.address.errors
+              %}style="border-color:#ef4444;" {% endif %}>
+            <i class="fas fa-map-marker-alt icon"></i>
+            <label for="address">{% if request.LANGUAGE_CODE == 'sw' %}Anuani{% else %}Address{% endif %}</label>
+          </div>
+          {% for error in form.address.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
+            error }}</div>{% endfor %}
+        </div>
+      </div>
+
+      <div class="input_row" style="margin-top: 0.8rem; margin-bottom: 0.2rem;">
+        <!-- Password -->
+        <div style="width: 100%;">
+          <div class="input_group" style="position: relative; margin-bottom: 0;">
+            <input type="password" id="password" name="password1" placeholder=" " maxlength="16"
+              autocomplete="new-password" required
+              style="padding-right: 40px;{% if form.password1.errors or form.password2.errors %} border-color:#ef4444;{% endif %}">
+            <i class="fas fa-lock icon"></i>
+            <label for="password">{% if request.LANGUAGE_CODE == 'sw' %}Nenosiri{% else %}Password{% endif %}</label>
+            <i class="fas fa-eye" id="toggleRegPassword"
+              style="position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; pointer-events: auto; z-index: 10;"></i>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div style="width: 100%;">
+          <div class="input_group" style="position: relative; margin-bottom: 0;">
+            <input type="password" id="confirm-password" name="password2" placeholder=" " maxlength="16"
+              autocomplete="new-password" required
+              style="padding-right: 40px;{% if form.password1.errors or form.password2.errors %} border-color:#ef4444;{% endif %}">
+            <i class="fas fa-check-circle icon"></i>
+            <label for="confirm-password">{% if request.LANGUAGE_CODE == 'sw' %}Thibitisha Nenosiri{% else %}Confirm
+              password{% endif %}</label>
+            <i class="fas fa-eye" id="toggleRegConfirmPassword"
+              style="position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; pointer-events: auto; z-index: 10;"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shared Password Errors -->
+      {% if form.password1.errors or form.password2.errors %}
+      <div class="field-error" style="width: 100%; margin-top: 0; margin-bottom: 1rem;">
+        {% if form.password1.errors %}
+        <div><i class="fas fa-exclamation-circle"></i> {{ form.password1.errors.0 }}</div>
+        {% endif %}
+        {% if form.password2.errors and form.password2.errors.0 != form.password1.errors.0 %}
+        <div><i class="fas fa-exclamation-circle"></i> {{ form.password2.errors.0 }}</div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <button type="submit">{% if request.LANGUAGE_CODE == 'sw' %}Tengeneza Akaunti{% else %}Create Account{% endif
+        %}</button>
+      <a href="{% url 'login' %}" class="back-link">{% if request.LANGUAGE_CODE == 'sw' %}Tayari una akaunti?
+        <span>Ingia hapa</span>{% else %}Already have an account? <span>Sign In</span>{% endif %}</a>
+
+      <!-- Go Back -->
+      <div class="go-back-container">
+        <button type="button" class="go-back-btn" onclick="window.location.href='{% url 'home' %}'">
+          <i class="fas fa-arrow-left"></i> {% if request.LANGUAGE_CODE == 'sw' %}Rudi Mwanzo{% else %}Back to home{%
+          endif %}
+        </button>
+      </div>
+    </div>
+  </form>
+  <script>
+    function setupToggle(toggleId, inputId) {
+      var toggle = document.getElementById(toggleId);
+      var input = document.getElementById(inputId);
+      if (toggle && input) {
+        toggle.addEventListener('click', function () {
+          var type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+          input.setAttribute('type', type);
+          this.classList.toggle('fa-eye');
+          this.classList.toggle('fa-eye-slash');
+        });
+      }
+    }
+    setupToggle('toggleRegPassword', 'password');
+    setupToggle('toggleRegConfirmPassword', 'confirm-password');
+  </script>
+  {% include "core/toast.html" %}
+</body>
+
+</html>

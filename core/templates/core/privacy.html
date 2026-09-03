@@ -1,0 +1,129 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Sera ya Faragha{% else %}Privacy Policy{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+    .info-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px 30px 60px;
+    }
+    .info-card {
+        background: #ffffff;
+        border-radius: 30px;
+        padding: 40px 48px;
+        box-shadow: 0 12px 40px rgba(20, 60, 20, 0.05);
+        border: 1px solid #dceadc;
+    }
+    .info-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e2ede2;
+    }
+    .info-header h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #084608;
+        letter-spacing: -0.5px;
+    }
+    .info-header p {
+        color: #3a5f3a;
+        margin-top: 10px;
+        font-size: 1.05rem;
+    }
+    .info-section {
+        margin-bottom: 28px;
+    }
+    .info-section h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0e740e;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .info-section h3 .material-icons {
+        color: #2a7a2a;
+        font-size: 24px;
+    }
+    .info-section p, .info-section ul {
+        color: #1a2e1a;
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+    .info-section ul {
+        padding-left: 24px;
+        margin-top: 10px;
+    }
+    .info-section li {
+        margin-bottom: 6px;
+    }
+</style>
+
+<div class="info-container">
+    <div class="info-card">
+        <div class="info-header">
+            <h1>{% if request.LANGUAGE_CODE == 'sw' %}Sera ya Faragha{% else %}Privacy Policy{% endif %}</h1>
+            <p>{% if request.LANGUAGE_CODE == 'sw' %}Tunajali na kulinda taarifa zako.{% else %}We care about and protect your information.{% endif %}</p>
+        </div>
+
+        {% if request.LANGUAGE_CODE == 'sw' %}
+        <div class="info-section">
+            <h3><span class="material-icons">security</span> 1. Utangulizi</h3>
+            <p>Karibu kwenye PlantID Medicine. Tunathamini faragha yako na tuko makini katika kulinda taarifa zako binafsi unapotumia mfumo wetu kutambua mimea na kujifunza matumizi yake ya dawa.</p>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">data_usage</span> 2. Taarifa Tunazokusanya</h3>
+            <p>Tunaweza kukusanya taarifa zifuatazo:</p>
+            <ul>
+                <li>Taarifa unazotoa wakati wa kujisajili (Kama vile Username na Barua pepe).</li>
+                <li>Picha za mimea unazopakia kwa ajili ya utambuzi.</li>
+                <li>Mimea unayohifadhi katika akaunti yako.</li>
+            </ul>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">settings_suggest</span> 3. Jinsi Tunavyotumia Taarifa Zako</h3>
+            <p>Taarifa hizi hutumika kuboresha mfumo wetu, kutoa majibu sahihi ya mimea uliyotafuta, na kuhifadhi historia yako ya matumizi ili uweze kuirejelea wakati wowote.</p>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">share</span> 4. Kushiriki Taarifa</h3>
+            <p>Hatushiriki, hatuuzi, wala kusambaza taarifa zako binafsi kwa watu wengine (third-parties) bila idhini yako, isipokuwa pale inapotakiwa kisheria.</p>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">contact_support</span> 5. Wasiliana Nasi</h3>
+            <p>Ikiwa una maswali yoyote kuhusu sera hii, tafadhali wasiliana nasi kupitia ukurasa wetu wa <a href="{% url 'contact' %}" style="color: #2a7a2a; font-weight: bold;">Mawasiliano</a>.</p>
+        </div>
+
+        {% else %}
+        <div class="info-section">
+            <h3><span class="material-icons">security</span> 1. Introduction</h3>
+            <p>Welcome to PlantID Medicine. We value your privacy and are committed to protecting your personal information while you use our platform to identify plants and learn about their medicinal uses.</p>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">data_usage</span> 2. Information We Collect</h3>
+            <p>We may collect the following information:</p>
+            <ul>
+                <li>Information you provide during registration (such as Username and Email).</li>
+                <li>Images of plants you upload for identification.</li>
+                <li>Plants you save to your personal history.</li>
+            </ul>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">settings_suggest</span> 3. How We Use Your Information</h3>
+            <p>This information is used to improve our system's accuracy, provide accurate identification results, and save your usage history for future reference.</p>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">share</span> 4. Sharing of Information</h3>
+            <p>We do not share, sell, or distribute your personal information to third parties without your explicit consent, except when required by law.</p>
+        </div>
+        <div class="info-section">
+            <h3><span class="material-icons">contact_support</span> 5. Contact Us</h3>
+            <p>If you have any questions regarding this policy, please reach out to us via our <a href="{% url 'contact' %}" style="color: #2a7a2a; font-weight: bold;">Contact page</a>.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

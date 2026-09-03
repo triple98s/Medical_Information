@@ -1,0 +1,143 @@
+<!-- Global Toast Messages -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      pointer-events: none;
+      width: 100%;
+      max-width: 600px;
+    }
+    .toast-notification {
+      pointer-events: auto;
+      background: #fff;
+      border-left: 6px solid #2a7a2a;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-width: 300px;
+      max-width: 450px;
+      width: 90%;
+      transform: translateY(-50px);
+      opacity: 0;
+      animation: slideDown 0.5s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      font-family: sans-serif;
+    }
+    .toast-notification.hide {
+      opacity: 0;
+      transform: translateY(-50px);
+    }
+    .toast-notification.success { border-left-color: #2a7a2a; }
+    .toast-notification.success .toast-icon { color: #2a7a2a; }
+    .toast-notification.error { border-left-color: #d32f2f; }
+    .toast-notification.error .toast-icon { color: #d32f2f; }
+    .toast-notification.info { border-left-color: #0288d1; }
+    .toast-notification.info .toast-icon { color: #0288d1; }
+    .toast-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .toast-icon { font-size: 24px; }
+    .toast-text {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #1a2e1a;
+    }
+    .toast-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #88a888;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 16px;
+      transition: color 0.2s;
+    }
+    .toast-close:hover { color: #1a2e1a; }
+    @keyframes slideDown {
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @media (max-width: 600px) {
+      .toast-container {
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .toast-notification {
+        min-width: 0;
+        width: 100%;
+      }
+    }
+  </style>
+
+  <div class="toast-container" id="globalToastContainer">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="toast-notification {{ message.tags }}">
+          <div class="toast-content">
+            <span class="material-icons toast-icon">
+              {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% else %}info{% endif %}
+            </span>
+            <span class="toast-text">{{ message }}</span>
+          </div>
+          <button class="toast-close" onclick="this.parentElement.remove()"><span class="material-icons">close</span></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <script>
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('globalToastContainer');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = `toast-notification ${type}`;
+      
+      let iconName = 'info';
+      if (type === 'success') iconName = 'check_circle';
+      else if (type === 'error') iconName = 'error';
+
+      toast.innerHTML = `
+        <div class="toast-content">
+          <span class="material-icons toast-icon">${iconName}</span>
+          <span class="toast-text">${message}</span>
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()"><span class="material-icons">close</span></button>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('hide');
+        setTimeout(() => toast.remove(), 500);
+      }, 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var toasts = document.querySelectorAll('.toast-notification');
+      toasts.forEach(function(toast) {
+        setTimeout(function() {
+          toast.classList.add('hide');
+          setTimeout(function() {
+            if (toast.parentElement) {
+              toast.parentElement.removeChild(toast);
+            }
+          }, 500);
+        }, 4000);
+      });
+    });
+  </script>

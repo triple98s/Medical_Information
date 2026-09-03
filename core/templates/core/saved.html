@@ -1,0 +1,52 @@
+{% extends 'core/base.html' %}
+{% block title %}Saved Information - PlantMed{% endblock %}
+{% block content %}
+<div class="hero">
+  <h1>{% if request.LANGUAGE_CODE == 'sw' %}Taarifa Zilizohifadhiwa{% else %}Saved Information{% endif %}</h1>
+  <h3>{% if request.LANGUAGE_CODE == 'sw' %}Kumbukumbu Zako{% else %}Your Bookmarks{% endif %}</h3>
+  <p>{% if request.LANGUAGE_CODE == 'sw' %}Tazama taarifa zote za mimea na matibabu uliyohifadhi. Taarifa hizi zitakaa hapa daima mpaka utakapozifuta.{% else %}View the plant identifications and medicine info you have saved. This information is saved permanently until you delete it.{% endif %}</p>
+</div>
+
+<div class="id-card">
+  <div style="padding: 20px 10px;">
+    {% if saved %}
+      <div style="display:flex; flex-direction:column; gap:16px;">
+      {% for item in saved %}
+        <div style="background:#f8fcf8; border:1px solid #dceadc; padding:16px 24px; border-radius:20px; display:flex; justify-content:space-between; align-items:center; transition:transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(20,60,20,0.06)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
+          <a href="{% url 'home' %}?q={{ item.plant.local_name|urlencode }}" style="display:flex; align-items:center; gap:16px; text-decoration:none; flex:1;" title="{% if request.LANGUAGE_CODE == 'sw' %}Bofya kuona taarifa za mmea huu{% else %}Click to view plant details{% endif %}">
+            <div style="width:50px; height:50px; background:#eaf5ea; border-radius:12px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+              {% if item.plant.image %}
+                <img src="{{ item.plant.image.url }}" style="width:100%; height:100%; object-fit:cover;" alt="{{ item.plant.local_name }}">
+              {% else %}
+                <span class="material-icons" style="color:#2a7a2a; font-size:28px;">bookmark</span>
+              {% endif %}
+            </div>
+            <div>
+              <h4 style="color:#1a3a1a; font-size:1.05rem; margin-bottom:4px; transition:color 0.2s;" onmouseover="this.style.color='#2a7a2a'" onmouseout="this.style.color='#1a3a1a'">{{ item.plant.local_name }}</h4>
+              <p style="color:#4a6a4a; font-size:0.85rem; margin-bottom:0;"><em>{{ item.plant.scientific_name }}</em></p>
+              <p style="color:#88a888; font-size:0.8rem; margin-top:4px; font-weight:500;">
+                <span class="material-icons" style="font-size:14px; vertical-align:middle; margin-right:4px;">calendar_today</span>{{ item.created_at|date:"d M Y" }}
+              </p>
+            </div>
+          </a>
+          <form method="post" action="{% url 'saved' %}" style="margin:0;" data-confirm="{% if request.LANGUAGE_CODE == 'sw' %}Je, una uhakika unataka kufuta taarifa hii?{% else %}Are you sure you want to delete this saved item?{% endif %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete_saved">
+            <input type="hidden" name="saved_id" value="{{ item.id }}">
+            <button type="submit" style="background:#fff; border:1px solid #fbd5d5; color:#e53935; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:0.2s;" onmouseover="this.style.background='#fde8e8'" onmouseout="this.style.background='#fff'" title="{% if request.LANGUAGE_CODE == 'sw' %}Futa Taarifa Hii{% else %}Delete Saved Item{% endif %}">
+              <span class="material-icons" style="font-size:20px;">delete_outline</span>
+            </button>
+          </form>
+        </div>
+      {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align:center; padding:40px 20px;">
+        <span class="material-icons" style="font-size:64px; color:#c8dcc8; margin-bottom:16px;">bookmark_border</span>
+        <h3 style="color:#2d572d; margin-bottom:8px;">{% if request.LANGUAGE_CODE == 'sw' %}Hakuna Taarifa Zilizohifadhiwa{% else %}No Saved Information Yet{% endif %}</h3>
+        <p style="color:#5a7a5a; font-size:0.95rem;">{% if request.LANGUAGE_CODE == 'sw' %}Hujahifadhi taarifa zozote bado. Tumia kitufe cha 'Hifadhi' unapata matokeo ya utambuzi!{% else %}You have no saved information yet. Use the 'Save' button when viewing plant results!{% endif %}</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
