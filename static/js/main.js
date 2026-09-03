@@ -286,7 +286,16 @@
         },
         body: formData
       })
-      .then(function(r) { return r.json(); })
+      .then(function(r) {
+        return r.json().catch(function() {
+          throw new Error('Server error (' + r.status + '). Please try again.');
+        }).then(function(data) {
+          if (!r.ok) {
+            throw new Error(data.error || 'Server error (' + r.status + ').');
+          }
+          return data;
+        });
+      })
       .then(function(data) {
         identifyBtn.innerHTML = '<span class="material-icons">travel_explore</span> ' + (document.documentElement.lang && document.documentElement.lang.startsWith('sw') ? 'Tambua Mmea' : 'Identify Plant');
         identifyBtn.disabled = false;

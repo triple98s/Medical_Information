@@ -1,5 +1,7 @@
 # core/views.py
 import os
+import logging
+from functools import wraps
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
@@ -15,6 +17,23 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image # type: ignore
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input # type: ignore
+
+logger = logging.getLogger(__name__)
+
+
+def json_api_errors(view):
+    """Return JSON for unexpected API errors and retain the traceback in logs."""
+    @wraps(view)
+    def wrapped(request, *args, **kwargs):
+        try:
+            return view(request, *args, **kwargs)
+        except Exception:
+            logger.exception("Plant identification request failed")
+            return JsonResponse(
+                {"error": "Plant identification failed on the server. Please try again shortly."},
+                status=500,
+            )
+    return wrapped
 
 def identify_plant(image_path):
     """
@@ -1066,6 +1085,7 @@ def search_plant_text(request):
     return JsonResponse(plant_data)
 
 @csrf_exempt
+@json_api_errors
 def identify_plant_api(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'POST method required'}, status=405)
