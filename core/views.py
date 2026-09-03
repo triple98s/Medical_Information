@@ -27,10 +27,10 @@ def json_api_errors(view):
     def wrapped(request, *args, **kwargs):
         try:
             return view(request, *args, **kwargs)
-        except Exception:
+        except Exception as error:
             logger.exception("Plant identification request failed")
             return JsonResponse(
-                {"error": "Plant identification failed on the server. Please try again shortly."},
+                {"error": f"Plant identification failed ({type(error).__name__})."},
                 status=500,
             )
     return wrapped
