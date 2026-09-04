@@ -1,3 +1,7 @@
+import json
+from pathlib import Path
+
+from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
@@ -5,12 +9,24 @@ from core.models import MedicinalPlant
 
 
 class Command(BaseCommand):
-    help = "Seed the initial medicinal-plant records if the database is empty."
+    help = "Load initial plants and synchronize the administrator-maintained plant information."
 
     def handle(self, *args, **options):
-        if MedicinalPlant.objects.exists():
-            self.stdout.write("Plant data already exists; skipping seed.")
-            return
+        if not MedicinalPlant.objects.exists():
+            call_command("loaddata", "plants")
+            self.stdout.write("Initial plant data loaded.")
+        else:
+            self.stdout.write("Initial plant records already exist.")
 
-        call_command("loaddata", "plants")
-        self.stdout.write(self.style.SUCCESS("Initial plant data loaded."))
+        fixture_path = Path(settings.BASE_DIR) / "core" / "fixtures" / "admin_plants.json"
+        records = json.loads(fixture_path.read_text(encoding="utf-8"))
+        updated = 0
+        for record in records:
+            local_name = record.pop("local_name")
+            MedicinalPlant.objects.update_or_create(
+                local_name=local_name,
+                defaults={"local_name": local_name, **record},
+            )
+            updated += 1
+
+        self.stdout.write(self.style.SUCCESS(f"Administrator plant information synchronized ({updated} records)."))

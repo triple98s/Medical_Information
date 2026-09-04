@@ -74,8 +74,9 @@ def identify_plant(image_path):
         # Map AI model class names to database local_names
         # Hii inasaidia kufananisha majina ya model (k.m "Swaumu") na yale ya kwenye database ("Kitunguu saumu")
         NAME_MAPPING = {
-            "Swaumu": "Kitunguu saumu",
-            "Manjano": "Bizari manjano",
+            "Swaumu": "Kitunguu Saumu",
+            "Manjano": "Bizari Manjano",
+            "Mkundekunde": "Mkundekunde au Mkunde Pori",
         }
         if plant_name in NAME_MAPPING:
             plant_name = NAME_MAPPING[plant_name]
