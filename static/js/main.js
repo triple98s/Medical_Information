@@ -85,6 +85,16 @@
 
   // Helper to update Result UI
   function updateResultUI(plant) {
+    // Keep the result identifiers together with the displayed card. This also
+    // restores Save after a page refresh or language change from sessionStorage.
+    if (plant.history_id) {
+      lastResultHistoryId = plant.history_id;
+      lastResultPlantId = plant.id || null;
+    } else if (plant.id) {
+      lastResultHistoryId = null;
+      lastResultPlantId = plant.id;
+    }
+
     var localNameTitle = document.getElementById('localNameTitle');
     var sciNameText = document.getElementById('sciNameText');
     var comNameText = document.getElementById('comNameText');
@@ -155,6 +165,10 @@
   var resultImage = document.getElementById('resultImage');
 
   function prepareForIdentification() {
+    // A newly selected image has not been identified yet, so it must not save
+    // the details from a previously displayed plant.
+    lastResultHistoryId = null;
+    lastResultPlantId = null;
     var resultCard = document.getElementById('resultCard');
     var identifyBtn = document.getElementById('identifyBtn');
     if (resultCard) {
