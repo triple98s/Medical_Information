@@ -340,8 +340,7 @@
         <i class="fas fa-user icon"></i>
         <label for="first-name">{% if request.LANGUAGE_CODE == 'sw' %}Jina la Kwanza{% else %}First name{% endif %}</label>
       </div>
-      {% for error in form.first_name.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
-        error }}</div>{% endfor %}
+      {% if form.first_name.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{ form.first_name.errors.0 }}</div>{% endif %}
 
       <!-- Last name -->
       <div class="input_group" style="margin-top: 0.8rem; margin-bottom: 0.2rem;">
@@ -350,8 +349,7 @@
         <i class="fas fa-user icon"></i>
         <label for="last-name">{% if request.LANGUAGE_CODE == 'sw' %}Jina la Mwisho{% else %}Last name{% endif %}</label>
       </div>
-      {% for error in form.last_name.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
-        error }}</div>{% endfor %}
+      {% if form.last_name.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{ form.last_name.errors.0 }}</div>{% endif %}
 
       <div class="input_row" style="margin-top: 0.8rem;">
         <!-- Phone -->
@@ -362,8 +360,7 @@
             <i class="fas fa-phone icon"></i>
             <label for="phone">{% if request.LANGUAGE_CODE == 'sw' %}Namba ya Simu{% else %}Phone number{% endif %}</label>
           </div>
-          {% for error in form.phone.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
-            error }}</div>{% endfor %}
+          {% if form.phone.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{ form.phone.errors.0 }}</div>{% endif %}
         </div>
 
         <!-- Email -->
@@ -374,8 +371,7 @@
             <i class="fas fa-envelope icon"></i>
             <label for="email">{% if request.LANGUAGE_CODE == 'sw' %}Barua pepe{% else %}Email address{% endif %}</label>
           </div>
-          {% for error in form.email.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
-            error }}</div>{% endfor %}
+          {% if form.email.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{ form.email.errors.0 }}</div>{% endif %}
         </div>
       </div>
 
@@ -393,8 +389,7 @@
             <i class="fas fa-chevron-down"
               style="position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; font-size: 0.9rem; transition: color 0.3s ease;"></i>
           </div>
-          {% for error in form.gender.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
-            error }}</div>{% endfor %}
+          {% if form.gender.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{ form.gender.errors.0 }}</div>{% endif %}
         </div>
 
         <!-- Address -->
@@ -405,8 +400,7 @@
             <i class="fas fa-map-marker-alt icon"></i>
             <label for="address">{% if request.LANGUAGE_CODE == 'sw' %}Anuani{% else %}Address{% endif %}</label>
           </div>
-          {% for error in form.address.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{
-            error }}</div>{% endfor %}
+          {% if form.address.errors %}<div class="field-error"><i class="fas fa-exclamation-circle"></i> {{ form.address.errors.0 }}</div>{% endif %}
         </div>
       </div>
 

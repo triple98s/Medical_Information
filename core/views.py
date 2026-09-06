@@ -20,6 +20,11 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input # type: 
 
 logger = logging.getLogger(__name__)
 
+# Taarifa za dawa zinaruhusiwa tu baada ya model kuitambua picha kwa uhakika
+# wa 75% au zaidi.  Hii hulinda dhidi ya majibu ya mmea kwa picha zisizo za
+# mimea, kama karatasi, au picha zisizo wazi.
+MINIMUM_PLANT_CONFIDENCE = 75.0
+
 
 def json_api_errors(view):
     """Return JSON for unexpected API errors and retain the traceback in logs."""
@@ -49,7 +54,8 @@ def identify_plant(image_path):
             'local_name': 'Model Haijapatikana',
             'scientific_name': 'Unknown',
             'common_name': 'Unknown',
-            'medicinal_uses': 'Tafadhali fundisha AI kwanza (run train_mobilenet.py) ili uweze kutambua mimea.'
+            'medicinal_uses': 'Tafadhali fundisha AI kwanza (run train_mobilenet.py) ili uweze kutambua mimea.',
+            'is_confident': False,
         }
     
     try:
@@ -87,13 +93,15 @@ def identify_plant(image_path):
         print(f"AI PREDICTION (MobileNetV2): {plant_name} (Confidence: {confidence:.2f}%)")
         print(f"==================================================")
         
-        # Weka kikomo cha uhakika (Confidence Threshold) kuzuia udanganyifu
-        if confidence < 70.0:
+        # Usitoe utambuzi wala taarifa za dawa chini ya 75% ya uhakika.
+        if confidence < MINIMUM_PLANT_CONFIDENCE:
             return {
                 'local_name': 'Haitambuliki (Uhakika Mdogo)',
                 'scientific_name': 'Unknown',
                 'common_name': 'Unknown',
                 'medicinal_uses': 'Picha haitambuliki vizuri. Tafadhali jaribu kupiga picha iliyo wazi zaidi.',
+                'confidence': confidence,
+                'is_confident': False,
             }
         
         # Fetch from DB
@@ -105,7 +113,9 @@ def identify_plant(image_path):
                 'scientific_name': plant_db.scientific_name,
                 'common_name': plant_db.common_name,
                 'medicinal_uses': f"Faida: {plant_db.benefits_sw}\n\nMatumizi: {plant_db.medicinal_uses_sw}",
-                'precautions': plant_db.precautions_sw if plant_db.precautions_sw else "Hakuna tahadhari maalum zilizorekodiwa."
+                'precautions': plant_db.precautions_sw if plant_db.precautions_sw else "Hakuna tahadhari maalum zilizorekodiwa.",
+                'confidence': confidence,
+                'is_confident': True,
             }
         else:
             return {
@@ -113,7 +123,9 @@ def identify_plant(image_path):
                 'scientific_name': 'Unknown',
                 'common_name': 'Unknown',
                 'medicinal_uses': 'Taarifa za matibabu hazijapatikana kwenye kanzidata.',
-                'precautions': 'Hakuna tahadhari zilizopatikana.'
+                'precautions': 'Hakuna tahadhari zilizopatikana.',
+                'confidence': confidence,
+                'is_confident': True,
             }
             
     except Exception as e:
@@ -123,7 +135,8 @@ def identify_plant(image_path):
             'scientific_name': 'Error',
             'common_name': 'Error',
             'medicinal_uses': 'Kuna hitilafu katika mfumo wa utambuzi. Tafadhali jaribu tena.',
-            'precautions': 'Hakuna tahadhari zilizopatikana.'
+            'precautions': 'Hakuna tahadhari zilizopatikana.',
+            'is_confident': False,
         }
 
 def home(request):
@@ -1126,21 +1139,22 @@ def identify_plant_api(request):
     # Run AI Identification
     ai_result = identify_plant(history_entry.image.path)
     predicted_name = ai_result.get('local_name', 'Unknown')
+
+    # Ulinzi wa mwisho: usisome kanzidata ya dawa wala kuhifadhi history kama
+    # model haijafikia kiwango cha uhakika wa 75%.
+    if not ai_result.get('is_confident', False):
+        history_entry.delete()
+        msg = ai_result.get('medicinal_uses', 'Tafadhali jaribu picha nyingine.')
+        return JsonResponse({'error': msg}, status=422)
     
     # Find the predicted plant in the database
     matched_plant = MedicinalPlant.objects.filter(local_name__iexact=predicted_name).first()
     
     if not matched_plant:
-        # Check if the AI returned low confidence or error
-        if predicted_name == 'Haitambuliki (Uhakika Mdogo)' or predicted_name == 'Unknown' or predicted_name == 'Model Haijapatikana':
-            history_entry.delete()
-            msg = ai_result.get('medicinal_uses', 'Tafadhali jaribu picha nyingine.')
-            return JsonResponse({'error': msg}, status=404)
-        else:
-            # Plant recognized by model, but not in DB
-            history_entry.delete()
-            msg = "Taarifa za mmea huu hazipo kwenye kanzidata yetu. Tafadhali subiri utawala uweke taarifa zake." if lang_code == 'sw' else "Information for this plant is not available in our database yet."
-            return JsonResponse({'error': msg}, status=404)
+        # Plant recognized by model, but not in DB
+        history_entry.delete()
+        msg = "Taarifa za mmea huu hazipo kwenye kanzidata yetu. Tafadhali subiri utawala uweke taarifa zake." if lang_code == 'sw' else "Information for this plant is not available in our database yet."
+        return JsonResponse({'error': msg}, status=404)
         
     # Update history entry with accurate database info
     is_sw = lang_code == 'sw'
@@ -1156,6 +1170,7 @@ def identify_plant_api(request):
     return JsonResponse(response_data)
 
 @csrf_exempt
+@json_api_errors
 def save_plant_api(request):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Authentication required'}, status=401)
@@ -1174,10 +1189,12 @@ def save_plant_api(request):
     history_entry = None
     
     if history_id:
-        history_entry = get_object_or_404(PlantHistory, id=history_id, user=request.user)
-    elif plant_id:
+        history_entry = PlantHistory.objects.filter(id=history_id, user=request.user).first()
+
+    if not history_entry and plant_id:
         # User searched by text and wants to save it without existing history.
-        # We dynamically create a history snapshot.
+        # We create a snapshot if the displayed result came from search, or if
+        # its previous history belongs to a different/anonymous browser session.
         plant = get_object_or_404(MedicinalPlant, id=plant_id)
         lang_code = translation.get_language()
         is_sw = lang_code == 'sw'
