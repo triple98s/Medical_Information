@@ -54,19 +54,19 @@ class RegisterForm(forms.ModelForm):
         if phone:
             phone = phone.replace(' ', '')
             if not phone.startswith('+255') and not phone.startswith('0'):
-                raise forms.ValidationError("Namba ya simu inapaswa kuanza na +255 au 0.")
+                raise forms.ValidationError("Please enter a valid phone number.")
             
             if phone.startswith('+255') and len(phone) != 13:
-                raise forms.ValidationError("Namba inayoanza na +255 inapaswa kuwa na tarakimu 13 (k.m. +255712345678).")
+                raise forms.ValidationError("Please enter a valid phone number.")
                 
             if phone.startswith('0') and len(phone) != 10:
-                raise forms.ValidationError("Namba inayoanza na 0 inapaswa kuwa na tarakimu 10 (k.m. 0712345678).")
+                raise forms.ValidationError("Please enter a valid phone number.")
                 
             if phone.startswith('+255') and not phone[1:].isdigit():
-                raise forms.ValidationError("Namba inapaswa kuwa na tarakimu tupu baada ya +.")
+                raise forms.ValidationError("Please enter a valid phone number.")
                 
             if phone.startswith('0') and not phone.isdigit():
-                raise forms.ValidationError("Namba inapaswa kuwa na tarakimu tupu.")
+                raise forms.ValidationError("Please enter a valid phone number.")
                 
         return phone
 
@@ -158,4 +158,3 @@ class MedicinalPlantForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['common_name'].required = True
-
