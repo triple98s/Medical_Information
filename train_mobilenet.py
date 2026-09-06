@@ -16,6 +16,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_DIR = os.path.join(BASE_DIR, 'dataset')
 MODEL_SAVE_PATH = os.path.join(BASE_DIR, 'mobilenet_model.h5')
 CLASS_INDICES_PATH = os.path.join(BASE_DIR, 'class_indices.json')
+# Picha za karatasi, desktop, watu, vitu, n.k. ziwekwe kwenye folder hili.
+# Bila class hili classifier huchagua mmea mmoja hata picha isiwe mmea.
+NON_PLANT_CLASS_FOLDER = 'Sio_mmea'
 
 IMG_WIDTH, IMG_HEIGHT = 224, 224 # MobileNetV2 default size
 BATCH_SIZE = 16
@@ -74,6 +77,14 @@ def main():
 
     if not os.path.exists(DATASET_DIR):
         print(f"KOSA: Folder la dataset halipo: {DATASET_DIR}")
+        return
+
+    non_plant_dir = os.path.join(DATASET_DIR, NON_PLANT_CLASS_FOLDER)
+    if not os.path.isdir(non_plant_dir):
+        print(
+            f"KOSA: Weka picha zisizo mimea kwenye '{non_plant_dir}' kabla ya ku-train. "
+            "Mfano: karatasi, desktop/screenshots, watu, magari na vitu vingine."
+        )
         return
 
     # Kusoma picha zote kwenye folder letu

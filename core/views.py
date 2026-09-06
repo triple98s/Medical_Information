@@ -24,6 +24,9 @@ logger = logging.getLogger(__name__)
 # wa 75% au zaidi.  Hii hulinda dhidi ya majibu ya mmea kwa picha zisizo za
 # mimea, kama karatasi, au picha zisizo wazi.
 MINIMUM_PLANT_CONFIDENCE = 75.0
+# Hili ni class la picha ambazo si mimea. Linatengenezwa wakati wa training
+# kutoka folder `dataset/Sio_mmea/` na halipaswi kamwe kuonyesha taarifa za dawa.
+NON_PLANT_CLASS_NAMES = {"sio_mmea", "not_a_plant", "not_plant", "non_plant"}
 
 
 def json_api_errors(view):
@@ -76,6 +79,21 @@ def identify_plant(image_path):
         predictions = model.predict(img_array)
         predicted_class_index = int(np.argmax(predictions))
         plant_name = labels.get(predicted_class_index, 'Unknown')
+        confidence = float(np.max(predictions)) * 100
+
+        # Model iliyofundishwa na class `Sio_mmea` inaweza kukataa picha za
+        # karatasi, desktop, watu, au vitu vingine visivyo mimea hata ikiwa
+        # confidence yake ni kubwa.
+        normalized_plant_name = plant_name.strip().lower().replace('-', '_').replace(' ', '_')
+        if normalized_plant_name in NON_PLANT_CLASS_NAMES:
+            return {
+                'local_name': 'Haitambuliki (Si Mmea)',
+                'scientific_name': 'Unknown',
+                'common_name': 'Unknown',
+                'medicinal_uses': 'Picha uliyopakia haionekani kuwa ya mmea. Tafadhali pakia picha ya mmea iliyo wazi.',
+                'confidence': confidence,
+                'is_confident': False,
+            }
         
         # Map AI model class names to database local_names
         # Hii inasaidia kufananisha majina ya model (k.m "Swaumu") na yale ya kwenye database ("Kitunguu saumu")
@@ -87,8 +105,6 @@ def identify_plant(image_path):
         if plant_name in NAME_MAPPING:
             plant_name = NAME_MAPPING[plant_name]
             
-        confidence = float(np.max(predictions)) * 100
-        
         print(f"==================================================")
         print(f"AI PREDICTION (MobileNetV2): {plant_name} (Confidence: {confidence:.2f}%)")
         print(f"==================================================")
