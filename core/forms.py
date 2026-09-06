@@ -2,9 +2,16 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
+from django.utils.translation import get_language
 from .models import PlantHistory, Message, MedicinalPlant
 
 User = get_user_model()
+
+
+def validation_message(swahili, english):
+    """Return validation text in the language currently selected by the user."""
+    return swahili if (get_language() or "").lower().startswith("sw") else english
+
 
 class RegisterForm(forms.ModelForm):
     GENDER_CHOICES = [
@@ -25,55 +32,89 @@ class RegisterForm(forms.ModelForm):
         model = User
         fields = ("email", "first_name", "last_name", "phone", "gender", "address")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        required_message = validation_message("Sehemu hii inahitajika.", "This field is required.")
+        for field_name in ("first_name", "last_name", "phone", "gender", "address", "password1", "password2"):
+            self.fields[field_name].error_messages["required"] = required_message
+
+        self.fields["email"].error_messages.update({
+            "required": required_message,
+            "invalid": validation_message(
+                "Tafadhali weka anwani sahihi ya barua pepe.",
+                "Please enter a valid email address.",
+            ),
+        })
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("User with this email already exists.")
+            raise forms.ValidationError(validation_message(
+                "Barua pepe hii tayari imesajiliwa.",
+                "An account with this email already exists.",
+            ))
         return email
 
     def clean_first_name(self):
         first_name = self.cleaned_data.get('first_name')
         if first_name and any(char.isdigit() for char in first_name):
-            raise forms.ValidationError("Jina la kwanza halipaswi kuwa na namba.")
+            raise forms.ValidationError(validation_message(
+                "Jina la kwanza halipaswi kuwa na namba.",
+                "First name must not contain numbers.",
+            ))
         return first_name
 
     def clean_last_name(self):
         last_name = self.cleaned_data.get('last_name')
         if last_name and any(char.isdigit() for char in last_name):
-            raise forms.ValidationError("Jina la mwisho halipaswi kuwa na namba.")
+            raise forms.ValidationError(validation_message(
+                "Jina la mwisho halipaswi kuwa na namba.",
+                "Last name must not contain numbers.",
+            ))
         return last_name
 
     def clean_address(self):
         address = self.cleaned_data.get('address')
         if address and any(char.isdigit() for char in address):
-            raise forms.ValidationError("Anuani haipaswi kuwa na namba.")
+            raise forms.ValidationError(validation_message(
+                "Anuani haipaswi kuwa na namba.",
+                "Address must not contain numbers.",
+            ))
         return address
 
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
         if phone:
             phone = phone.replace(' ', '')
+            invalid_phone_message = validation_message(
+                "Tafadhali weka namba sahihi ya simu.",
+                "Please enter a valid phone number.",
+            )
             if not phone.startswith('+255') and not phone.startswith('0'):
-                raise forms.ValidationError("Please enter a valid phone number.")
+                raise forms.ValidationError(invalid_phone_message)
             
             if phone.startswith('+255') and len(phone) != 13:
-                raise forms.ValidationError("Please enter a valid phone number.")
+                raise forms.ValidationError(invalid_phone_message)
                 
             if phone.startswith('0') and len(phone) != 10:
-                raise forms.ValidationError("Please enter a valid phone number.")
+                raise forms.ValidationError(invalid_phone_message)
                 
             if phone.startswith('+255') and not phone[1:].isdigit():
-                raise forms.ValidationError("Please enter a valid phone number.")
+                raise forms.ValidationError(invalid_phone_message)
                 
             if phone.startswith('0') and not phone.isdigit():
-                raise forms.ValidationError("Please enter a valid phone number.")
+                raise forms.ValidationError(invalid_phone_message)
                 
         return phone
 
     def clean_password1(self):
         password1 = self.cleaned_data.get('password1')
         if password1 and len(password1) < 8:
-            raise forms.ValidationError("Password is too short. It must contain at least 8 characters.")
+            raise forms.ValidationError(validation_message(
+                "Nenosiri ni fupi sana. Liwe na angalau herufi 8.",
+                "Password is too short. It must contain at least 8 characters.",
+            ))
         return password1
 
     def clean_password2(self):
@@ -90,9 +131,15 @@ class RegisterForm(forms.ModelForm):
 
         if password1 and password2:
             if password1 != password2:
-                self.add_error('password2', "Password doesn't match.")
+                self.add_error('password2', validation_message(
+                    "Nenosiri halilingani.",
+                    "Passwords do not match.",
+                ))
             elif len(password2) < 8:
-                self.add_error('password2', "Password is too short. It must contain at least 8 characters.")
+                self.add_error('password2', validation_message(
+                    "Nenosiri ni fupi sana. Liwe na angalau herufi 8.",
+                    "Password is too short. It must contain at least 8 characters.",
+                ))
                 
         return cleaned_data
 
