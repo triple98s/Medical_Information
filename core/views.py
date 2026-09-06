@@ -24,18 +24,28 @@ logger = logging.getLogger(__name__)
 # wa 75% au zaidi.  Hii hulinda dhidi ya majibu ya mmea kwa picha zisizo za
 # mimea, kama karatasi, au picha zisizo wazi.
 MINIMUM_PLANT_CONFIDENCE = 75.0
+FEATURE_PROFILES_FILENAME = 'plant_feature_profiles.json'
 # Hili ni class la picha ambazo si mimea. Linatengenezwa wakati wa training
 # kutoka folder `dataset/Sio_mmea/` na halipaswi kamwe kuonyesha taarifa za dawa.
 NON_PLANT_CLASS_NAMES = {"sio_mmea", "not_a_plant", "not_plant", "non_plant"}
 
 
 @lru_cache(maxsize=1)
-def load_plant_identification_assets(model_path, class_indices_path):
+def load_plant_identification_assets(model_path, class_indices_path, feature_profiles_path):
     """Load the TensorFlow model once per Gunicorn worker, not once per image."""
     model = tf.keras.models.load_model(model_path)
     with open(class_indices_path, 'r', encoding='utf-8') as file:
         class_indices = json.load(file)
-    return model, {index: name for name, index in class_indices.items()}
+    with open(feature_profiles_path, 'r', encoding='utf-8') as file:
+        feature_profiles = json.load(file)['profiles']
+
+    # The final classifier and its penultimate feature vector are evaluated in
+    # one pass, keeping the open-set check fast.
+    inference_model = tf.keras.Model(
+        inputs=model.input,
+        outputs=[model.output, model.layers[-2].output],
+    )
+    return inference_model, {index: name for name, index in class_indices.items()}, feature_profiles
 
 
 def json_api_errors(view):
@@ -58,22 +68,26 @@ def identify_plant(image_path):
     """
     model_path = os.path.join(settings.BASE_DIR, 'mobilenet_model.h5')
     class_indices_path = os.path.join(settings.BASE_DIR, 'class_indices.json')
+    feature_profiles_path = os.path.join(settings.BASE_DIR, FEATURE_PROFILES_FILENAME)
     
     # Kama model haipo, rudisha ujumbe wa kosa
-    if not os.path.exists(model_path) or not os.path.exists(class_indices_path):
-        print(f"KOSA: Model ({model_path}) au Class Indices haijapatikana. Hakikisha ume-run train_mobilenet.py kwanza.")
+    if not all(os.path.exists(path) for path in (model_path, class_indices_path, feature_profiles_path)):
+        print("KOSA: Model, class indices, au feature profiles haijapatikana. "
+              "Run build_plant_profiles.py baada ya training.")
         return {
             'local_name': 'Model Haijapatikana',
             'scientific_name': 'Unknown',
             'common_name': 'Unknown',
-            'medicinal_uses': 'Tafadhali fundisha AI kwanza (run train_mobilenet.py) ili uweze kutambua mimea.',
+            'medicinal_uses': 'Faili za uthibitisho wa model hazijapatikana. Run build_plant_profiles.py kabla ya ku-deploy model.',
             'is_confident': False,
         }
     
     try:
         # Model na labels hupakiwa mara ya kwanza tu; requests zinazofuata
         # hutumia cache ili utambuzi uwe wa haraka.
-        model, labels = load_plant_identification_assets(model_path, class_indices_path)
+        inference_model, labels, feature_profiles = load_plant_identification_assets(
+            model_path, class_indices_path, feature_profiles_path,
+        )
         
         # Preprocess image kwa kutumia MobileNetV2 preprocess_input
         img = image.load_img(image_path, target_size=(224, 224))
@@ -82,10 +96,35 @@ def identify_plant(image_path):
         img_array = preprocess_input(img_array)
         
         # Predict
-        predictions = model.predict(img_array, verbose=0)
+        predictions, feature_vectors = inference_model.predict(img_array, verbose=0)
         predicted_class_index = int(np.argmax(predictions))
         plant_name = labels.get(predicted_class_index, 'Unknown')
         confidence = float(np.max(predictions)) * 100
+
+        # Open-set check: a softmax classifier must choose one trained class,
+        # even for an unknown picture. Reject it unless its feature vector is
+        # sufficiently similar to genuine training examples of that class.
+        profile = feature_profiles.get(plant_name)
+        if not profile:
+            raise ValueError(f"Missing feature profile for model class: {plant_name}")
+        feature_vector = np.asarray(feature_vectors[0], dtype=np.float32)
+        feature_norm = np.linalg.norm(feature_vector)
+        centroid = np.asarray(profile['centroid'], dtype=np.float32)
+        similarity = float(np.dot(feature_vector, centroid) / (feature_norm * np.linalg.norm(centroid) + 1e-8))
+        if similarity < float(profile['min_similarity']):
+            is_swahili = (translation.get_language() or '').lower().startswith('sw')
+            return {
+                'local_name': 'Haitambuliki (Nje ya Mafunzo)',
+                'scientific_name': 'Unknown',
+                'common_name': 'Unknown',
+                'medicinal_uses': (
+                    'Picha hii haifanani vya kutosha na mimea iliyofundishwa. Tafadhali pakia picha ya mmea iliyo wazi.'
+                    if is_swahili else
+                    'This image does not sufficiently match any trained plant. Please upload a clear plant image.'
+                ),
+                'confidence': confidence,
+                'is_confident': False,
+            }
 
         # Model iliyofundishwa na class `Sio_mmea` inaweza kukataa picha za
         # karatasi, desktop, watu, au vitu vingine visivyo mimea hata ikiwa
