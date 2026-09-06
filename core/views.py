@@ -1,7 +1,7 @@
 # core/views.py
 import os
 import logging
-from functools import wraps
+from functools import lru_cache, wraps
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
@@ -27,6 +27,15 @@ MINIMUM_PLANT_CONFIDENCE = 75.0
 # Hili ni class la picha ambazo si mimea. Linatengenezwa wakati wa training
 # kutoka folder `dataset/Sio_mmea/` na halipaswi kamwe kuonyesha taarifa za dawa.
 NON_PLANT_CLASS_NAMES = {"sio_mmea", "not_a_plant", "not_plant", "non_plant"}
+
+
+@lru_cache(maxsize=1)
+def load_plant_identification_assets(model_path, class_indices_path):
+    """Load the TensorFlow model once per Gunicorn worker, not once per image."""
+    model = tf.keras.models.load_model(model_path)
+    with open(class_indices_path, 'r', encoding='utf-8') as file:
+        class_indices = json.load(file)
+    return model, {index: name for name, index in class_indices.items()}
 
 
 def json_api_errors(view):
@@ -62,12 +71,9 @@ def identify_plant(image_path):
         }
     
     try:
-        # Load model and indices
-        model = tf.keras.models.load_model(model_path)
-        with open(class_indices_path, 'r') as f:
-            class_indices = json.load(f)
-            
-        labels = {v: k for k, v in class_indices.items()}
+        # Model na labels hupakiwa mara ya kwanza tu; requests zinazofuata
+        # hutumia cache ili utambuzi uwe wa haraka.
+        model, labels = load_plant_identification_assets(model_path, class_indices_path)
         
         # Preprocess image kwa kutumia MobileNetV2 preprocess_input
         img = image.load_img(image_path, target_size=(224, 224))
@@ -76,7 +82,7 @@ def identify_plant(image_path):
         img_array = preprocess_input(img_array)
         
         # Predict
-        predictions = model.predict(img_array)
+        predictions = model.predict(img_array, verbose=0)
         predicted_class_index = int(np.argmax(predictions))
         plant_name = labels.get(predicted_class_index, 'Unknown')
         confidence = float(np.max(predictions)) * 100
@@ -86,11 +92,16 @@ def identify_plant(image_path):
         # confidence yake ni kubwa.
         normalized_plant_name = plant_name.strip().lower().replace('-', '_').replace(' ', '_')
         if normalized_plant_name in NON_PLANT_CLASS_NAMES:
+            is_swahili = (translation.get_language() or '').lower().startswith('sw')
             return {
                 'local_name': 'Haitambuliki (Si Mmea)',
                 'scientific_name': 'Unknown',
                 'common_name': 'Unknown',
-                'medicinal_uses': 'Picha uliyopakia haionekani kuwa ya mmea. Tafadhali pakia picha ya mmea iliyo wazi.',
+                'medicinal_uses': (
+                    'Picha uliyopakia haionekani kuwa ya mmea. Tafadhali pakia picha ya mmea iliyo wazi.'
+                    if is_swahili else
+                    'The uploaded image does not appear to be a plant. Please upload a clear plant image.'
+                ),
                 'confidence': confidence,
                 'is_confident': False,
             }
@@ -111,11 +122,16 @@ def identify_plant(image_path):
         
         # Usitoe utambuzi wala taarifa za dawa chini ya 75% ya uhakika.
         if confidence < MINIMUM_PLANT_CONFIDENCE:
+            is_swahili = (translation.get_language() or '').lower().startswith('sw')
             return {
                 'local_name': 'Haitambuliki (Uhakika Mdogo)',
                 'scientific_name': 'Unknown',
                 'common_name': 'Unknown',
-                'medicinal_uses': 'Picha haitambuliki vizuri. Tafadhali jaribu kupiga picha iliyo wazi zaidi.',
+                'medicinal_uses': (
+                    'Picha haitambuliki vizuri. Tafadhali jaribu kupiga picha iliyo wazi zaidi.'
+                    if is_swahili else
+                    'The image could not be identified with enough confidence. Please upload a clearer plant image.'
+                ),
                 'confidence': confidence,
                 'is_confident': False,
             }
