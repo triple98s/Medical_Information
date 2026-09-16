@@ -339,7 +339,7 @@
         </button>
         <button class="tab-btn" data-tab="customers-tab" onclick="switchTab('customers-tab', this)">
             <span class="material-icons">groups</span>
-            {% if request.LANGUAGE_CODE == 'sw' %}Dhibiti Wateja{% else %}Manage Customers{% endif %}
+            {% if request.LANGUAGE_CODE == 'sw' %}Dhibiti Wateja{% else %}Manage Users{% endif %}
         </button>
         <button class="tab-btn" data-tab="backup-tab" onclick="switchTab('backup-tab', this)">
             <span class="material-icons">storage</span>
@@ -460,7 +460,7 @@
     <div id="customers-tab-content" class="tab-content" style="display: none;">
         <div class="settings-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; gap: 12px; flex-wrap: wrap;">
-                <h3 style="margin-bottom: 0;"><span class="material-icons">groups</span> {% if request.LANGUAGE_CODE == 'sw' %}Dhibiti Wateja{% else %}Manage Customers{% endif %}</h3>
+                <h3 style="margin-bottom: 0;"><span class="material-icons">groups</span> {% if request.LANGUAGE_CODE == 'sw' %}Dhibiti Mtumiaji{% else %}Manage User{% endif %}</h3>
                 <div class="search-box" style="margin: 0; max-width: 280px;">
                     <button class="search-btn" type="button" onclick="filterAdminCustomers()">
                         {% if request.LANGUAGE_CODE == 'sw' %}Tafuta{% else %}Search{% endif %}

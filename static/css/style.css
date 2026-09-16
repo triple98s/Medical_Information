@@ -648,7 +648,15 @@ body {
 .camera-controls .close-camera-btn:hover { background: #c0392b; }
 
 /* ----- FOOTER ----- */
-.footer { border-top: 1px solid #dceadc; padding: 28px 32px; margin-top: 30px; background: #f8fbf8; width: 100%; flex-shrink: 0; }
+.footer {
+  border-top: 1px solid #dceadc;
+  padding: 28px 32px;
+  margin-top: 30px;
+  margin-left: 76px;
+  background: #f8fbf8;
+  width: calc(100% - 76px);
+  flex-shrink: 0;
+}
 .footer-content { max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; color: #1f401f; font-size: 0.95rem; }
 .footer-links { display: flex; flex-wrap: wrap; gap: 20px 30px; order: 2; }
 .footer-links a { font-weight: 500; color: #1a401a; text-decoration: none; }
@@ -752,6 +760,7 @@ body {
   }
   
   .main-wrapper { padding: 20px 10px 0px; margin-left: 0; width: 100%; }
+  .footer { margin-left: 0; width: 100%; }
 
   .sidebar { width: 280px; left: -280px; padding: 28px 22px; }
   .sidebar.open { left: 0; width: 280px; }

@@ -857,7 +857,7 @@ def admin_settings(request):
             return redirect('admin_settings')
 
         elif action == 'create_backup':
-            import datetime, os, subprocess
+            import datetime, os, shutil, subprocess
             from django.conf import settings
             backup_dir = os.path.join(settings.BASE_DIR, 'backups')
             if not os.path.exists(backup_dir):
@@ -868,16 +868,34 @@ def admin_settings(request):
             backup_path = os.path.join(backup_dir, backup_filename)
             
             try:
-                db_name = os.environ.get('DB_NAME', 'plantmed_db')
-                db_user = os.environ.get('DB_USER', 'postgres')
-                db_password = os.environ.get('DB_PASSWORD', '')
-                db_host = os.environ.get('DB_HOST', '127.0.0.1')
-                db_port = os.environ.get('DB_PORT', '5432')
+                database = settings.DATABASES['default']
+                db_name = database['NAME']
+                db_user = database.get('USER', '')
+                db_password = database.get('PASSWORD', '')
+                db_host = database.get('HOST', '127.0.0.1')
+                db_port = str(database.get('PORT', '5432'))
+
+                # Allow deployments to provide their own pg_dump location, then
+                # fall back to PATH and the standard Windows installation path.
+                pg_dump_candidates = [
+                    os.environ.get('PG_DUMP_PATH'),
+                    shutil.which('pg_dump'),
+                    r'C:\Program Files\PostgreSQL\18\bin\pg_dump.exe',
+                ]
+                pg_dump_path = next(
+                    (path for path in pg_dump_candidates if path and os.path.isfile(path)),
+                    None,
+                )
+                if not pg_dump_path:
+                    raise FileNotFoundError(
+                        'pg_dump haijapatikana. Weka PG_DUMP_PATH kwenye .env '
+                        'au ongeza PostgreSQL bin folder kwenye PATH.'
+                    )
 
                 env = os.environ.copy()
                 env['PGPASSWORD'] = db_password
                 pg_dump_cmd = [
-                    r'C:\Program Files\PostgreSQL\18\bin\pg_dump.exe',
+                    pg_dump_path,
                     '-U', db_user,
                     '-h', db_host,
                     '-p', db_port,
@@ -887,6 +905,8 @@ def admin_settings(request):
                 subprocess.run(pg_dump_cmd, env=env, check=True)
                 messages.success(request, 'Backup imetengenezwa kikamilifu.' if request.LANGUAGE_CODE == 'sw' else 'Backup created successfully.')
             except Exception as e:
+                if os.path.exists(backup_path):
+                    os.remove(backup_path)
                 messages.error(request, f'Kuna tatizo: {e}' if request.LANGUAGE_CODE == 'sw' else f'Error creating backup: {e}')
             return redirect('admin_settings')
 

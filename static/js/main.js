@@ -537,9 +537,13 @@
         var payload = {};
         if (lastResultHistoryId) {
           payload.history_id = lastResultHistoryId;
-        } else if (lastResultPlantId) {
+        }
+        // Include the plant ID as a safe fallback when a saved browser card
+        // contains history from an earlier or anonymous session.
+        if (lastResultPlantId) {
           payload.plant_id = lastResultPlantId;
-        } else {
+        }
+        if (!payload.history_id && !payload.plant_id) {
           if(window.showToast) showToast(document.documentElement.lang === 'sw' ? 'Hakuna taarifa za mmea za kuhifadhi.' : 'No plant data to save.', 'error'); else alert('No plant data to save.');
           return;
         }
@@ -554,7 +558,11 @@
           },
           body: JSON.stringify(payload)
         })
-        .then(function(r) { return r.json(); })
+        .then(function(r) {
+          return r.json().catch(function() {
+            throw new Error('Server error (' + r.status + '). Please try again.');
+          });
+        })
         .then(function(data) {
           saveBtn.disabled = false;
           if (data.status === 'ok') {
